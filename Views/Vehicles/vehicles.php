@@ -1,0 +1,69 @@
+<?php 
+    headerAdmin($data); 
+    getModal('Vehicle/modalVehicle',$data);
+?>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <div class="container">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1><i class="fa-solid fa-car"></i> <strong><?= strtoupper($data['page_title']); ?></strong></h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item">
+                    <?php if($_SESSION['permisosMod']['w']){ ?>
+                    <button type="button" onclick="openModal();" class="btn btn-block btn-success btn-sm"><i class="fa-solid fa-circle-plus"></i> <strong>Agregar vehiculo</strong></button>
+                    <?php } ?>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="container">
+            <div class="row">
+              <div class="col-12">
+                <!-- Default box -->
+                <div class="card card-info card-outline">
+                  <div class="card-header">
+                    <h3 class="card-title"><i class="fa-solid fa-car"></i> Listando vehiculos</h3>
+
+                    <div class="card-tools">
+                      
+                    </div>
+                  </div>
+                  <div class="card-body table-responsive">
+                    <table class="table table-hover text-nowrap" id="tableVehicles">
+                      <thead class="bg-thead">
+                        <tr>
+                          <th>Acciones</th>
+                          <th>Marca</th>
+                          <th>Modelo</th>
+                          <th>Color</th>
+                          <th>Año</th>
+                          <th>Placa</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+<?php footerAdmin($data); ?>
+    
