@@ -190,8 +190,7 @@ class EmployeesModel extends Mysql
 								   string $identification,
 								   string $passport,
 								   int $empType,
-								   int $ocupationId
-	) {
+								   int $ocupationId) {
 		if ($idEmployee <= 0) {
 			return false;
 		}

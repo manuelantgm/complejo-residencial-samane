@@ -8,7 +8,7 @@
 			parent::__construct();
 		}
 		public function cantUsuarios(){
-			$sql = "SELECT COUNT(*) as total FROM persons WHERE status != 0";
+			$sql = "SELECT COUNT(*) as total FROM usuarios WHERE status != 0";
 			$request = $this->select($sql);
 			$total = $request['total']; 
 			return $total;
@@ -31,11 +31,10 @@
 		}
 		public function cantFamilies($idUsuario){
 		    $sql = "SELECT COUNT(*) as total 
-		            FROM persons 
+		            FROM families 
 		            WHERE status != 0  
-		              AND user_id = ?
-					  AND type = ?";
-		    $request = $this->select($sql, [$idUsuario, "familia"]);
+		              AND user_id = ?";
+		    $request = $this->select($sql, [$idUsuario]);
 		    return $request['total'];
 		}
 		public function cantEmployees($idUsuario){

@@ -146,29 +146,51 @@
                 $this->db->begin();
 
                 if ($isNew) {
-                    $employeeId = $this->model->insertFamily(
+                    $familyId = $this->model->insertFamily(
                         $data['idUser'],
-                        $data['name'],
-                        $data['lastName'],
+						$data['intlegalage'],
+                        $data['names'],
+                        $data['lastNames'],
                         $data['identification'],
                         $data['passport'],
-                        $data['empType'],
-                        $data['ocupationId']
+                        $data['streetid'],
+                        $data['homenumber'],
+						$data['phone'],
+						$data['email'],
+						$data['password'],
+						$data['relationship']
                     );
+					if ($familyId === 'identificacionExist') {
+						throw new Exception('La identificación ya existe.');
+					}
 
-                    if (!$employeeId || intval($employeeId) <= 0) {
-                        throw new Exception('No fue posible registrar el familiar.');
-                    }
+					if ($familyId === 'passportExist') {
+						throw new Exception('El pasaporte ya existe.');
+					}
+
+					if ($familyId === 'emailExist') {
+						throw new Exception('El email ya existe.');
+					}
+
+					if (!$familyId || intval($familyId) <= 0) {
+						throw new Exception('No fue posible registrar el familiar.');
+					}
                 } else {
                     $updated = $this->model->updateFamily(
-                        $data['idEmployee'],
-                        $data['name'],
-                        $data['lastName'],
+                        $data['idFamily'],
+						$data['intlegalage'],
+                        $data['names'],
+                        $data['lastNames'],
                         $data['identification'],
                         $data['passport'],
-                        $data['empType'],
-                        $data['ocupationId']
+                        $data['streetid'],
+                        $data['homenumber'],
+						$data['phone'],
+						$data['email'],
+						$data['password'],
+						$data['relationship']
                     );
+
                     if ($updated === 'identificacionExist') {
                         throw new Exception('La identificación ya existe.');
                     }
@@ -176,16 +198,11 @@
                         throw new Exception('El pasaporte ya existe.');
                     }
                     if (!$updated) {
-                        throw new Exception('No fue posible actualizar el empleado.');
+                        throw new Exception('No fue posible actualizar el familiar.');
                     }
-
-                    $employeeId = $data['idEmployee'];
-                }
-
-                $savedWorkdays = $this->model->replaceEmployeeWorkdays($employeeId, $data['workdays']);
-
-                if (!$savedWorkdays) {
-                    throw new Exception('No fue posible guardar los días de trabajo.');
+					if ($updated === 'emailExist') {
+                        throw new Exception('El email ya existe.');
+                    }
                 }
 
                 $this->db->commit();
@@ -213,117 +230,99 @@
         }
 
         private function validateFamilyForm(array $post): array
-        {
-            $idFamily = isset($post['idFamily']) ? intval($post['idFamily']) : 0;
-            $idUser = isset($_SESSION['idUser']) ? intval($_SESSION['idUser']) : 0;
+		{
+			$idFamily = isset($post['idFamily']) ? intval($post['idFamily']) : 0;
+			$idUser = isset($_SESSION['idUser']) ? intval($_SESSION['idUser']) : 0;
+			$isNew = ($idFamily === 0);
 
 			$intlegalage = isset($post['listAge'])
-                ? preg_replace('/[^0-9]/', '', strClean($post['listAge']))
-                : '';
+				? intval(preg_replace('/[^0-9]/', '', strClean($post['listAge'])))
+				: 0;
 
-            $identification = isset($post['txtIdentification'])
-                ? preg_replace('/[^0-9]/', '', strClean($post['txtIdentification']))
-                : '';
+			$identification = isset($post['txtIdentification'])
+				? preg_replace('/[^0-9]/', '', strClean($post['txtIdentification']))
+				: '';
 
-            $passport = isset($post['txtPassport'])
-                ? strtoupper(trim(strClean($post['txtPassport'])))
-                : '';
+			$passport = isset($post['txtPassport'])
+				? strtoupper(trim(strClean($post['txtPassport'])))
+				: '';
 
-            $name = isset($post['txtName'])
-                ? strtoupper(trim(strClean($post['txtName'])))
-                : '';
+			$name = isset($post['txtName'])
+				? strtoupper(trim(strClean($post['txtName'])))
+				: '';
 
-            $lastName = isset($post['txtLastName'])
-                ? strtoupper(trim(strClean($post['txtLastName'])))
-                : '';
+			$lastName = isset($post['txtLastName'])
+				? strtoupper(trim(strClean($post['txtLastName'])))
+				: '';
 
 			$phone = preg_replace('/[^0-9]/', '', strClean($post['intPhone'] ?? ''));
 
 			$streetid = isset($post['listStreetId']) ? intval($post['listStreetId']) : 0;
-
 			$homenumber = isset($post['intNumber']) ? intval($post['intNumber']) : 0;
 
 			$relationship = isset($post['txtRelationship'])
-                ? strtoupper(trim(strClean($post['txtRelationship'])))
-                : '';
-			
-			$email = strtolower(strClean($post['txtEmail'] ?? '')) ?: generateRandomEmail();
+				? strtoupper(trim(strClean($post['txtRelationship'])))
+				: '';
 
-            if ($intlegalage <= 0) {
-                throw new Exception('Debe indicar si su pariente es mayor o menor de edad.');
-            }
+			$email = strtolower(strClean($post['txtEmail'] ?? ''));
+			if ($email === '') {
+				$email = generateRandomEmail();
+			}
+
+			$rawPassword = $post['txtPassword'] ?? '';
+			$generatedPassword = false;
+
+			if ($isNew) {
+				if ($rawPassword === '') {
+					$rawPassword = passGenerator();
+					$generatedPassword = true;
+				}
+
+				if (strlen($rawPassword) < 6) {
+					throw new Exception('La contraseña debe tener al menos 6 caracteres.');
+				}
+
+				$password = password_hash($rawPassword, PASSWORD_DEFAULT);
+			} else {
+				if ($rawPassword !== '' && strlen($rawPassword) < 6) {
+					throw new Exception('La contraseña debe tener al menos 6 caracteres.');
+				}
+
+				$password = $rawPassword !== ''
+					? password_hash($rawPassword, PASSWORD_DEFAULT)
+					: '';
+			}
+
+			if ($intlegalage <= 0) {
+				throw new Exception('Debe indicar si su pariente es mayor o menor de edad.');
+			}
 
 			if ($name === '' || $lastName === '') {
-                throw new Exception('El nombre y el apellido son obligatorios.');
-            }
-
-			if ($identification === '' || $passport === '') {
-                throw new Exception('Debes indicar al menos una identificación.');
-            }
-
-            $workdays = $this->parseWorkdays($post);
-
-            return [
-                'idFamily'       => $idFamily,
-                'idUser'         => $idUser,
-				'intlegalage'	 => $intlegalage,
-				'names'          => $name,
-                'lastNames'      => $lastName,
-                'identification' => $identification,
-                'passport'       => $passport,
-                'streetid'       => $streetid,
-                'homenumber'     => $homenumber,
-                'phone'       	 => $phone,
-				'email'		   	 =>$email,
-				'password' 		 => $password,
-				'relationship'   => $relationship
-            ];
-        }
-
-		/*public function getFamilies(){
-			if($_SESSION['permisosMod']['r']){
-				$idUsuario = intval($_SESSION['idUser']);
-				$arrData = $this->model->selectFamilies($idUsuario);
-				for ($i=0; $i < count($arrData); $i++) {
-					$btnView = '';
-					$btnEdit = '';
-					$btnDelete = '';
-
-					if($arrData[$i]['status'] == 1)
-					{
-						$arrData[$i]['status'] = '<span class="badge badge-success">Activo</span>';
-					}else{
-						$arrData[$i]['status'] = '<span class="badge badge-danger">Inactivo</span>';
-					}
-
-
-					if ($_SESSION['permisosMod']['r']) {
-						$btnView = '<button class="btn" onClick="fntViewFamily('.$arrData[$i]['id_person'].')" title="Ver familiar"><i class="far fa-eye"></i> Mas detalles</button>';
-					}
-					if ($_SESSION['permisosMod']['u']) {
-						$btnEdit = '<button class="btn" onClick="fntEditInfo(this,'.$arrData[$i]['id_person'].')" title="Editar cliente"><i class="fa-solid fa-pen-to-square"></i> Editar</button>';
-					}
-					if ($_SESSION['permisosMod']['d']) {
-						$btnDelete = '<button class="btn" onClick="fntDelInfo('.$arrData[$i]['id_person'].')" title="Eliminar cliente"><i class="far fa-trash-alt"></i> Eliminar</button>';
-					}
-
-					// Menú de opciones
-					$arrData[$i]['options'] = '
-					<div class="btn-group pull-right">
-						<button type="button" class="btn btn-sm dropdown-toggle bg-info" data-toggle="dropdown" aria-expanded="false">
-							<i class="fa-solid fa-gear"></i>
-						</button>
-						<ul class="dropdown-menu">
-							<li>'.$btnView.'</li>
-							<li>'.$btnEdit.'</li>
-							<li>'.$btnDelete.'</li>
-						</ul>
-					</div>';
-				}
-				echo json_encode($arrData,JSON_UNESCAPED_UNICODE);
+				throw new Exception('El nombre y el apellido son obligatorios.');
 			}
-			die();
-		}*/
+
+			if ($identification === '' && $passport === '') {
+				throw new Exception('Debe indicar al menos una identificación o pasaporte.');
+			}
+
+			return [
+				'idFamily'          => $idFamily,
+				'idUser'            => $idUser,
+				'intlegalage'       => $intlegalage,
+				'names'             => $name,
+				'lastNames'         => $lastName,
+				'identification'    => $identification,
+				'passport'          => $passport,
+				'streetid'          => $streetid,
+				'homenumber'        => $homenumber,
+				'phone'             => $phone,
+				'email'             => $email,
+				'password'          => $password,
+				'rawPassword'       => $generatedPassword ? $rawPassword : null,
+				'relationship'      => $relationship
+			];
+		}
+
 		public function getFamilies(){
             if($_SESSION['permisosMod']['r']){
                 $idUsuario = intval($_SESSION['idUser']);

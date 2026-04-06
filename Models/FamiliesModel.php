@@ -23,18 +23,20 @@ class FamiliesModel extends Mysql
 		parent::__construct();
 	}	
 
-	public function insertFamily(int $userid,
-								 int $legalage,
-								 string $name, 
-								 string $lastname,
-								 string $identification,
-								 string $passport,
-								 int $streetid,
-								 int $homenumber, 
-								 int $phone,
-								 string $email, 
-								 string $password,
-								 string $relationship){
+	public function insertFamily(
+		int $userid,
+		int $legalage,
+		string $name,
+		string $lastname,
+		string $identification,
+		string $passport,
+		int $streetid,
+		int $homenumber,
+		string $phone,
+		string $email,
+		string $password,
+		string $relationship
+	) {
 		$this->intIdUser = $userid;
 		$this->intLegalAge = $legalage;
 		$this->strName = $name;
@@ -43,58 +45,89 @@ class FamiliesModel extends Mysql
 		$this->strPassport = $passport;
 		$this->intIdStreet = $streetid;
 		$this->intHomeNumber = $homenumber;
-		$this->intPhone = $phone;
+		$this->strPhone = $phone;
 		$this->strEmail = $email;
 		$this->strPassword = $password;
 		$this->strRelationship = $relationship;
-		
 
-		$return = 0;
-		if(!empty($this->strEmail)){
-			$sql = "SELECT * FROM families WHERE 
-				email = '{$this->strEmail}' ";
-			$request_email = $this->select_all($sql);
-			if (!empty($request_email)) {
-				$return = "emailExist";
-				return $return;
+		if (!empty($this->strEmail)) {
+			$sql = "SELECT id_family 
+					FROM families 
+					WHERE email = ? 
+					LIMIT 1";
+			$requestEmail = $this->select($sql, [$this->strEmail]);
+
+			if (!empty($requestEmail)) {
+				return "emailExist";
 			}
 		}
 
-		if(empty($request_email)){
-			$query_insert  = "INSERT INTO families(user_id,
-												  legal_age,
-												  names,
-												  last_names,
-												  identification,
-												  passport,
-												  street_id,
-												  home_number,
-												  phone,
-												  email,
-												  password,
-												  relationship) 
-							  VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-        	$arrData = array($this->intIdUser,
-        					 $this->intLegalAge,
-        					 $this->strName,
-        					 $this->strLastName,
-        					 $this->strdentification,
-							 $this->strPassport,
-        					 $this->intIdStreet,
-        					 $this->intHomeNumber,
-        					 $this->intPhone,
-        					 $this->strEmail,
-        					 $this->strPassword,
-							 $this->strRelationship
-        					);
-        	$request_insert = $this->insert($query_insert,$arrData);
-        	if(!empty($request_insert)){
-        		$return = $request_insert;
-        	}else{
-        		$return = "exist";
-        	}
-        	return $return;	
+		if (!empty($this->strIdentification)) {
+			$sql = "SELECT id_family
+					FROM families
+					WHERE identification = ?
+					AND status != 0
+					LIMIT 1";
+
+			$exists = $this->select($sql, [$this->strIdentification]);
+
+			if (!empty($exists)) {
+				return "identificacionExist";
+			}
 		}
+
+		if (!empty($this->strPassport)) {
+			$sql = "SELECT id_family
+					FROM families
+					WHERE passport = ?
+					AND status != 0
+					LIMIT 1";
+
+			$exists = $this->select($sql, [$this->strPassport]);
+
+			if (!empty($exists)) {
+				return "passportExist";
+			}
+		}
+
+		$sqlInsert = "INSERT INTO families(
+							user_id,
+							legal_age,
+							names,
+							last_names,
+							identification,
+							passport,
+							street_id,
+							home_number,
+							phone,
+							email,
+							password,
+							relationship
+						) 
+					VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+
+		$arrData = [
+			$this->intIdUser,
+			$this->intLegalAge,
+			$this->strName,
+			$this->strLastName,
+			$this->strIdentification,
+			$this->strPassport,
+			$this->intIdStreet,
+			$this->intHomeNumber,
+			$this->strPhone,
+			$this->strEmail,
+			$this->strPassword,
+			$this->strRelationship
+		];
+
+		$requestInsert = $this->insert($sqlInsert, $arrData);
+
+		if (empty($requestInsert)) {
+			return false;
+		}
+
+		return $requestInsert;
 	}
 
 	public function selectFamilies(int $iduser)
@@ -158,6 +191,38 @@ class FamiliesModel extends Mysql
 										   AND id_family != $this->intIdFamily ";
 		$request = $this->select_all($sql);
 
+		// Validar identificación duplicada
+		if (!empty($identification)) {
+			$sql = "SELECT id_family
+					FROM families
+					WHERE identification = ?
+					AND id_family != ?
+					AND status != 0
+					LIMIT 1";
+
+			$exists = $this->select($sql, [$identification, $this->intIdFamily]);
+
+			if (!empty($exists)) {
+				return "identificacionExist";
+			}
+		}
+
+		// Validar passport duplicado
+		if (!empty($this->strPassport)) {
+			$sql = "SELECT id_family
+					FROM families
+					WHERE passport = ?
+					AND id_family != ?
+					AND status != 0
+					LIMIT 1";
+
+			$exists = $this->select($sql, [$this->strPassport, $this->intIdFamily]);
+
+			if (!empty($exists)) {
+				return "passportExist";
+			}
+		}
+
 		if(empty($request)){
 			if($this->strPassword  != "")
 			{
@@ -219,11 +284,9 @@ class FamiliesModel extends Mysql
 	public function deleteFamily(int $intidfamily)
 	{
 		$this->intIdFamily = $intidfamily;
-		$sql = "UPDATE persons SET status = ? WHERE id_person = $this->intIdFamily ";
+		$sql = "UPDATE families SET status = ? WHERE id_family = $this->intIdFamily ";
 		$arrData = array(0);
 		$request = $this->update($sql,$arrData);
 		return $request;
 	}
 }
-
- ?>

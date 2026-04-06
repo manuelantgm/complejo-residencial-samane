@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
             divLoading.style.display = "flex";
             let request = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-            let ajaxUrl = base_url+'/Families/setFamily'; 
+            let ajaxUrl = base_url+'/Families/upsertFamily'; 
             let formData = new FormData(formFamily);
             request.open("POST",ajaxUrl,true);
             request.send(formData);
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     if(objData.status)
                     {
                         if(rowTable == ""){
-                            tableFamilies.api().ajax.reload();
+                            tableFamilies.ajax.reload();
                         }else{
                             rowTable.cells[1].textContent = strName;
                             rowTable.cells[2].textContent = strLastName;
@@ -285,7 +285,7 @@ function fntDelInfo(personid){
                           text: objData.msg,
                           icon: "success"
                         });
-                        tableFamilies.api().ajax.reload();
+                        tableFamilies.ajax.reload();
                     }else{
                         Swal.fire({
                           title: "Atención!",
