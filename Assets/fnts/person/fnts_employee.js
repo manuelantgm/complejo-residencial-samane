@@ -383,10 +383,10 @@ function formatTime12(time24){
     return `${String(hours).padStart(2, '0')}:${minutes} ${suffix}`;
 }
 
-function fntDelInfo(personid){
+function fntDelInfo(employeeid){
     Swal.fire({
-        title: "ELIMINAR FAMILIAR",
-        text: "¿Realmente quieres eliminar el familiar que has seleccionado?",
+        title: "ELIMINAR EMPLEADO",
+        text: "¿Realmente quieres eliminar el empleado que has seleccionado?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
@@ -398,8 +398,8 @@ function fntDelInfo(personid){
         if (result.isConfirmed) 
         {
             let request = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-            let ajaxUrl = base_url+'/Families/delFamily';
-            let strData = "idFamily="+personid;
+            let ajaxUrl = base_url+'/Employees/delEmployee';
+            let strData = "idEmployee="+employeeid;
             request.open("POST",ajaxUrl,true);
             request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             request.send(strData);
@@ -413,7 +413,7 @@ function fntDelInfo(personid){
                           text: objData.msg,
                           icon: "success"
                         });
-                        tableEmployees.api().ajax.reload();
+                        tableEmployees.ajax.reload();
                     }else{
                         Swal.fire({
                           title: "Atención!",

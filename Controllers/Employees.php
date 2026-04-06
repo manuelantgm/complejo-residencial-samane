@@ -289,12 +289,12 @@
             die();
         }
 
-		public function delFamily()
+		public function delEmployee()
 		{
 			if($_POST){
 				if($_SESSION['permisosMod']['d']){
-					$intIdFamily = intval($_POST['idFamily']);
-					$requestDelete = $this->model->deleteFamily($intIdFamily);
+					$intIdEmployee = intval($_POST['idEmployee']);
+					$requestDelete = $this->model->deleteEmployee($intIdEmployee);
 					if($requestDelete)
 					{
 						$arrResponse = array('status' => true, 'msg' => 'Se ha eliminado el rejistro');

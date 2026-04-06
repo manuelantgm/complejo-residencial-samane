@@ -260,11 +260,11 @@ class EmployeesModel extends Mysql
 		return $request;
 	}
 
-	public function deleteFamily(int $intidfamily)
+	public function deleteEmployee(int $employeeid)
 	{
-		$this->intIdFamily = $intidfamily;
-		$sql = "UPDATE persons SET status = ? WHERE id_person = $this->intIdFamily ";
-		$arrData = array(0);
+		$this->intEmployeeId = $employeeid;
+		$sql = "UPDATE employees SET status = ? WHERE id_employee = ? ";
+		$arrData = array(0, $this->intEmployeeId);
 		$request = $this->update($sql,$arrData);
 		return $request;
 	}

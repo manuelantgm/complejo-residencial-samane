@@ -31,7 +31,7 @@
 			$this->views->getView($this,"families",$data);
 		}
 
-		public function setFamily(){
+		/*public function setFamily(){
 			if($_POST){
 				if(empty($_POST['txtName']) || empty($_POST['txtLastName']))
 				{
@@ -44,7 +44,8 @@
 						$idFamily = intval($_POST['idFamily']);
 						$idUser = intval($_SESSION['idUser']);
 						$intLegalAge = intval($_POST['listAge']); // 1 = mayor de edad, 2 = Menor de edad
-						$intIdentification =  preg_replace('/[^0-9]/', '',strClean($_POST['txtIdentification']));
+						$strIdentification = preg_replace('/[^0-9]/', '',strClean($_POST['txtIdentification']));
+						$strPassport = strtoupper(strClean($_POST['txtPassport']));
 						$strName = strtoupper(strClean($_POST['txtName']));
 						$strLastname = strtoupper(strClean($_POST['txtLastName']));
 						$strRelationship = strtoupper(strClean($_POST['txtRelationship']));
@@ -56,7 +57,6 @@
 						if(empty($strEmail)){
 							$strEmail = generateRandomEmail();
 						}
-						$strType = "familia";
 					
 						$request_family = "";
 						if($idFamily == 0)
@@ -69,7 +69,8 @@
 																			 $intLegalAge,
 																			 $strName, 
 																			 $strLastname,
-																			 $intIdentification,
+																			 $strIdentification,
+																			 $strPassport,
 																			 $intStreetId,
 																			 $intHomeNumber,
 																			 $intPhone, 
@@ -86,24 +87,19 @@
 																			 $intLegalAge,
 																		     $strName, 
 																		     $strLastname,
-																		     $intIdentification,
+																		     $strIdentification,
+																			 $strPassport,
 																		     $intStreetId,
 																		     $intHomeNumber,
 																		     $intPhone, 
 																		     $strEmail,
-																		     $strPassword);
+																		     $strPassword,
+																			 $strRelationship);
 							}
 						}
 
 						if($request_family > 0 )
 						{
-							$person_id = $request_family;
-							if($option == 1){
-								$request_relationship = $this->model->insertRelationship($person_id,$strRelationship);
-							}else{
-								$request_relationship = $this->model->updateRelationship($person_id,$strRelationship);
-							}
-
 							$this->db->commit(); // confirma
 						    $arrResponse = array('status' => true, 'msg' => $option == 1 
 						        ? 'Datos guardados correctamente.' 
@@ -117,15 +113,174 @@
 						}
 					} catch (Exception $e) {
 						$this->db->rollback(); // revierte si hubo error
-						$arrResponse = array("status" => false, "msg" => 'No es posible almacenar los datos.');
+						echo $request_family;
+						$arrResponse = array("status" => false, "msg" => 'No es posible almacenar los datos.'.$e);
 					}
 				}
 				echo json_encode($arrResponse,JSON_UNESCAPED_UNICODE);
 			}
 			die();
-		}
+		}*/
 
-		public function getFamilies(){
+		public function upsertFamily()
+        {
+            $arrResponse = ['status' => false, 'msg' => 'No se pudo procesar la solicitud.'];
+
+            try {
+                if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                    throw new Exception('Método no permitido.');
+                }
+
+                $data = $this->validateFamilyForm($_POST);
+
+                $isNew = ($data['idFamily'] === 0);
+
+                if ($isNew && empty($_SESSION['permisosMod']['w'])) {
+                    throw new Exception('No tiene permisos para registrar familias.');
+                }
+
+                if (!$isNew && empty($_SESSION['permisosMod']['u'])) {
+                    throw new Exception('No tiene permisos para actualizar familias.');
+                }
+
+                $this->db->begin();
+
+                if ($isNew) {
+                    $employeeId = $this->model->insertFamily(
+                        $data['idUser'],
+                        $data['name'],
+                        $data['lastName'],
+                        $data['identification'],
+                        $data['passport'],
+                        $data['empType'],
+                        $data['ocupationId']
+                    );
+
+                    if (!$employeeId || intval($employeeId) <= 0) {
+                        throw new Exception('No fue posible registrar el familiar.');
+                    }
+                } else {
+                    $updated = $this->model->updateFamily(
+                        $data['idEmployee'],
+                        $data['name'],
+                        $data['lastName'],
+                        $data['identification'],
+                        $data['passport'],
+                        $data['empType'],
+                        $data['ocupationId']
+                    );
+                    if ($updated === 'identificacionExist') {
+                        throw new Exception('La identificación ya existe.');
+                    }
+                    if ($updated === 'passportExist') {
+                        throw new Exception('El pasaporte ya existe.');
+                    }
+                    if (!$updated) {
+                        throw new Exception('No fue posible actualizar el empleado.');
+                    }
+
+                    $employeeId = $data['idEmployee'];
+                }
+
+                $savedWorkdays = $this->model->replaceEmployeeWorkdays($employeeId, $data['workdays']);
+
+                if (!$savedWorkdays) {
+                    throw new Exception('No fue posible guardar los días de trabajo.');
+                }
+
+                $this->db->commit();
+
+                $arrResponse = [
+                    'status' => true,
+                    'msg' => $isNew
+                        ? 'Datos guardados correctamente.'
+                        : 'Datos actualizados correctamente.'
+                ];
+
+            } catch (Exception $e) {
+                if ($this->db->inTransaction()) {
+                    $this->db->rollback();
+                }
+
+                $arrResponse = [
+                    'status' => false,
+                    'msg' => $e->getMessage()
+                ];
+            }
+
+            echo json_encode($arrResponse, JSON_UNESCAPED_UNICODE);
+            die();
+        }
+
+        private function validateFamilyForm(array $post): array
+        {
+            $idFamily = isset($post['idFamily']) ? intval($post['idFamily']) : 0;
+            $idUser = isset($_SESSION['idUser']) ? intval($_SESSION['idUser']) : 0;
+
+			$intlegalage = isset($post['listAge'])
+                ? preg_replace('/[^0-9]/', '', strClean($post['listAge']))
+                : '';
+
+            $identification = isset($post['txtIdentification'])
+                ? preg_replace('/[^0-9]/', '', strClean($post['txtIdentification']))
+                : '';
+
+            $passport = isset($post['txtPassport'])
+                ? strtoupper(trim(strClean($post['txtPassport'])))
+                : '';
+
+            $name = isset($post['txtName'])
+                ? strtoupper(trim(strClean($post['txtName'])))
+                : '';
+
+            $lastName = isset($post['txtLastName'])
+                ? strtoupper(trim(strClean($post['txtLastName'])))
+                : '';
+
+			$phone = preg_replace('/[^0-9]/', '', strClean($post['intPhone'] ?? ''));
+
+			$streetid = isset($post['listStreetId']) ? intval($post['listStreetId']) : 0;
+
+			$homenumber = isset($post['intNumber']) ? intval($post['intNumber']) : 0;
+
+			$relationship = isset($post['txtRelationship'])
+                ? strtoupper(trim(strClean($post['txtRelationship'])))
+                : '';
+			
+			$email = strtolower(strClean($post['txtEmail'] ?? '')) ?: generateRandomEmail();
+
+            if ($intlegalage <= 0) {
+                throw new Exception('Debe indicar si su pariente es mayor o menor de edad.');
+            }
+
+			if ($name === '' || $lastName === '') {
+                throw new Exception('El nombre y el apellido son obligatorios.');
+            }
+
+			if ($identification === '' || $passport === '') {
+                throw new Exception('Debes indicar al menos una identificación.');
+            }
+
+            $workdays = $this->parseWorkdays($post);
+
+            return [
+                'idFamily'       => $idFamily,
+                'idUser'         => $idUser,
+				'intlegalage'	 => $intlegalage,
+				'names'          => $name,
+                'lastNames'      => $lastName,
+                'identification' => $identification,
+                'passport'       => $passport,
+                'streetid'       => $streetid,
+                'homenumber'     => $homenumber,
+                'phone'       	 => $phone,
+				'email'		   	 =>$email,
+				'password' 		 => $password,
+				'relationship'   => $relationship
+            ];
+        }
+
+		/*public function getFamilies(){
 			if($_SESSION['permisosMod']['r']){
 				$idUsuario = intval($_SESSION['idUser']);
 				$arrData = $this->model->selectFamilies($idUsuario);
@@ -168,7 +323,27 @@
 				echo json_encode($arrData,JSON_UNESCAPED_UNICODE);
 			}
 			die();
-		}
+		}*/
+		public function getFamilies(){
+            if($_SESSION['permisosMod']['r']){
+                $idUsuario = intval($_SESSION['idUser']);
+                $arrData = $this->model->selectFamilies($idUsuario);
+
+                for ($i=0; $i < count($arrData); $i++) {
+                    // status como texto simple
+                    $arrData[$i]['status'] = $arrData[$i]['status'] == 1 ? 'Activo' : 'Inactivo';
+
+                    // opciones como flags
+                    $arrData[$i]['canView']   = $_SESSION['permisosMod']['r'] ? true : false;
+                    $arrData[$i]['canEdit']   = $_SESSION['permisosMod']['u'] ? true : false;
+                    $arrData[$i]['canDelete'] = $_SESSION['permisosMod']['d'] ? true : false;
+                }
+
+                header('Content-Type: application/json');
+                echo json_encode($arrData, JSON_UNESCAPED_UNICODE);
+            }
+            die();
+        }
 
 		public function getFamily($personid){
 			if($_SESSION['permisosMod']['r']){

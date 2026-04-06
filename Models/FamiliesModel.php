@@ -5,15 +5,15 @@ class FamiliesModel extends Mysql
 	private $intLegalAge;
 	private $strName;
 	private $strLastName;
-	private $intIdentification;
+	private $strIdentification;
+	private $strPassport;
 	private $intIdStreet;
 	private $intHomeNumber;
 	private $intPhone;
-	private $strType;
 	private $strEmail;
 	private $strPassword;
 
-	private $intPersonId;
+	private $intFamilyId;
 	private $strRelationship;
 
 	private $intIdFamily;
@@ -27,29 +27,31 @@ class FamiliesModel extends Mysql
 								 int $legalage,
 								 string $name, 
 								 string $lastname,
-								 int $identification,
+								 string $identification,
+								 string $passport,
 								 int $streetid,
 								 int $homenumber, 
 								 int $phone,
-								 string $type,
 								 string $email, 
-								 string $password){
+								 string $password,
+								 string $relationship){
 		$this->intIdUser = $userid;
 		$this->intLegalAge = $legalage;
 		$this->strName = $name;
 		$this->strLastName = $lastname;
-		$this->intIdentification = $identification;
+		$this->strIdentification = $identification;
+		$this->strPassport = $passport;
 		$this->intIdStreet = $streetid;
 		$this->intHomeNumber = $homenumber;
 		$this->intPhone = $phone;
-		$this->strType = $type;
 		$this->strEmail = $email;
 		$this->strPassword = $password;
+		$this->strRelationship = $relationship;
 		
 
 		$return = 0;
 		if(!empty($this->strEmail)){
-			$sql = "SELECT * FROM persons WHERE 
+			$sql = "SELECT * FROM families WHERE 
 				email = '{$this->strEmail}' ";
 			$request_email = $this->select_all($sql);
 			if (!empty($request_email)) {
@@ -59,29 +61,31 @@ class FamiliesModel extends Mysql
 		}
 
 		if(empty($request_email)){
-			$query_insert  = "INSERT INTO persons(user_id,
+			$query_insert  = "INSERT INTO families(user_id,
 												  legal_age,
-												  name,
-												  last_name,
+												  names,
+												  last_names,
 												  identification,
+												  passport,
 												  street_id,
 												  home_number,
 												  phone,
-												  type,
 												  email,
-												  password) 
+												  password,
+												  relationship) 
 							  VALUES(?,?,?,?,?,?,?,?,?,?,?)";
         	$arrData = array($this->intIdUser,
         					 $this->intLegalAge,
         					 $this->strName,
         					 $this->strLastName,
-        					 $this->intIdentification,
+        					 $this->strdentification,
+							 $this->strPassport,
         					 $this->intIdStreet,
         					 $this->intHomeNumber,
         					 $this->intPhone,
-        					 $this->strType,
         					 $this->strEmail,
-        					 $this->strPassword
+        					 $this->strPassword,
+							 $this->strRelationship
         					);
         	$request_insert = $this->insert($query_insert,$arrData);
         	if(!empty($request_insert)){
@@ -93,51 +97,35 @@ class FamiliesModel extends Mysql
 		}
 	}
 
-	public function insertRelationship(int $personid, string $relationship){
-		$this->intPersonId = $personid;
-		$this->strRelationship = $relationship;
-		$query_insert = "INSERT INTO families(person_id,relationship) 
-						 VALUES(?,?)";
-		$arrData = array($this->intPersonId,
-						 $this->strRelationship
-						);
-		$request_insert = $this->insert($query_insert,$arrData);
-		return $request_insert;
-	}
-
 	public function selectFamilies(int $iduser)
 	{
-		$sql = "SELECT id_person,
-					   name,
-					   last_name,
-					   identification,
-					   phone,
-					   type,
+		$sql = "SELECT id_family,
+					   names,
+					   last_names,
 					   status
-				FROM persons p
-				WHERE user_id = ? AND status != 0 ORDER BY id_person DESC"; 
+				FROM families
+				WHERE user_id = ? AND status != 0 ORDER BY id_family DESC"; 
 		$request = $this->select_all($sql, [$iduser]);
 		return $request;
 	}
 
-	public function selectFamily(int $idperson){
-		$this->intPersonId = $idperson;
-		$sql = "SELECT p.id_person,
-					   p.legal_age,
-					   p.name,
-					   p.last_name,
-					   f.relationship,
-					   p.identification,
-					   p.street_id,
-					   p.home_number,
-					   p.phone,
-					   p.email,
-					   p.status
-				FROM persons p
-				INNER JOIN families f
-				ON p.id_person = f.person_id
-				WHERE p.id_person = $this->intPersonId AND status != 0";
-		$request = $this->select($sql);
+	public function selectFamily(int $idfamily){
+		$this->intFamilyId = $idfamily;
+		$sql = "SELECT id_family,
+					   legal_age,
+					   names,
+					   last_names,
+					   identification,
+					   passport,
+					   street_id,
+					   home_number,
+					   phone,
+					   email,
+					   relationship,
+					   status
+				FROM families
+				WHERE id_family = ? AND status != ?";
+		$request = $this->select($sql,[$this->intFamilyId,0]);
 		return $request;
 	}
 
@@ -145,83 +133,86 @@ class FamiliesModel extends Mysql
 								 int $legalage,
 								 string $name, 
 								 string $lastname,
-								 int $identification,
+								 string $identification,
+								 string $passport,
 								 int $streetid,
 								 int $homenumber, 
 								 int $phone,
 								 string $email, 
-								 string $password) {
+								 string $password,
+								 string $relationship) {
 		$this->intIdFamily = $idperson;
 		$this->intLegalAge = $legalage;
 		$this->strName = $name;
 		$this->strLastName = $lastname;
-		$this->intIdentification = $identification;
+		$this->strIdentification = $identification;
+		$this->strPassport = $passport;
 		$this->intIdStreet = $streetid;
 		$this->intHomeNumber = $homenumber;
 		$this->intPhone = $phone;
 		$this->strEmail = $email;
 		$this->strPassword = $password;
+		$this->strRelationship = $relationship;
 
-		$sql = "SELECT * FROM persons WHERE (email = '{$this->strEmail}' AND id_person != $this->intIdFamily)
-										   AND id_person != $this->intIdFamily ";
+		$sql = "SELECT * FROM families WHERE (email = '{$this->strEmail}' AND id_family != $this->intIdFamily)
+										   AND id_family != $this->intIdFamily ";
 		$request = $this->select_all($sql);
 
 		if(empty($request)){
 			if($this->strPassword  != "")
 			{
-				$sql = "UPDATE persons SET legal_age = ?,
-											name = ?,
-											last_name = ?,
+				$sql = "UPDATE families SET legal_age = ?,
+											names = ?,
+											last_names = ?,
 											identification = ?,
+											passport = ?,
 											street_id = ?,
 											home_number = ?,
 											phone = ?,
 											email = ?,
-											password = ?
+											password = ?,
+											relationship = ?
 
-				WHERE id_person = $this->intIdFamily ";
+				WHERE id_family = $this->intIdFamily ";
 				$arrData = array($this->intLegalAge,
 								$this->strName,
 								$this->strLastName,
-								$this->intIdentification,
+								$this->strIdentification,
+								$this->strPassport,
 								$this->intIdStreet,
 								$this->intHomeNumber,
 								$this->intPhone,
 								$this->strEmail,
-								$this->strPassword);
+								$this->strPassword,
+								$this->strRelationship);
 			}else{
-				$sql = "UPDATE persons SET legal_age = ?,
-								    name = ?,
-									last_name = ?,
+				$sql = "UPDATE families SET legal_age = ?,
+								    names = ?,
+									last_names = ?,
 									identification = ?,
+									passport = ?,
 									street_id = ?,
 									home_number = ?,
 									phone = ?,
-									email = ?
+									email = ?,
+									relationship = ?
 
-				WHERE id_person = $this->intIdFamily ";
+				WHERE id_family = $this->intIdFamily ";
 				$arrData = array($this->intLegalAge,
 								$this->strName,
 								$this->strLastName,
-								$this->intIdentification,
+								$this->strIdentification,
+								$this->strPassport,
 								$this->intIdStreet,
 								$this->intHomeNumber,
 								$this->intPhone,
-								$this->strEmail);
+								$this->strEmail,
+								$this->strRelationship);
 			}
 			$request = $this->update($sql,$arrData);
 		}else{
 			$request = "exist";
 		}
-		return $request;
-	}
-
-	public function updateRelationship (int $personid, string $relationship){
-		$this->intIdFamily = $personid;
-		$this->strRelationship = $relationship;
-		$sql = "UPDATE families SET relationship = ? WHERE person_id = $this->intIdFamily ";
-		$arrData = array($this->strRelationship);
-		$request = $this->update($sql,$arrData);
 		return $request;
 	}
 

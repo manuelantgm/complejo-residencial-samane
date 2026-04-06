@@ -12,7 +12,6 @@
             <form id="formFamily" name="formFamily" class="form-horizontal" autocomplete="off">
               <input type="hidden" id="idFamily" name="idFamily" value="">
               <p class="text-primary">Los campos con asterisco (<span class="required">*</span>) son obligatorios.</p>
-
               <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="listAge">Mayor de edad <span class="required">*</span></label>
@@ -22,6 +21,8 @@
                       <option value="2">No</option>
                     </select>
                 </div>
+              </div>
+              <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="txtIdentification">Identificacion</label>
                   <input type="text" 
@@ -32,6 +33,15 @@
                          data-inputmask="'mask': '999-9999999-9'" 
                          data-mask 
                          autocomplete="new-password" />
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="txtPassport">Número de pasaporte si aplica:</label>
+                  <input type="text" 
+                        class="form-control" 
+                        id="txtPassport" 
+                        name="txtPassport" 
+                        placeholder="Número de pasaporte" 
+                        autocomplete="new-password" />
                 </div>
               </div>
               <div class="form-row">

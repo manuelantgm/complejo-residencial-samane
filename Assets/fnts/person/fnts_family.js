@@ -5,7 +5,7 @@ let divLoading = document.querySelector("#divLoading");
 document.addEventListener('DOMContentLoaded', function(){
 
     if (document.querySelector("#tableFamilies")) {
-        tableFamilies = $('#tableFamilies').dataTable( {
+        tableFamilies = $('#tableFamilies').DataTable({
             ordering:false,
             "aProcessing":true,
             "aServerSide":true,
@@ -13,14 +13,39 @@ document.addEventListener('DOMContentLoaded', function(){
                 "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
             },
             "ajax":{
-                "url": " "+base_url+"/Families/getFamilies",
+                "url": base_url + "/Families/getFamilies",
                 "dataSrc":""
             },
             "columns":[
-                {"data":"options"},
-                {"data":"name"},
-                {"data":"last_name"},
-                {"data":"status"}
+                {
+                    "data": null,
+                    "render": function(data, type, row){
+                        let btnView   = row.canView   ? `<button class="btn" onClick="fntViewFamily(${row.id_family})"><i class="far fa-eye"></i> Mas detalles</button>` : "";
+                        let btnEdit   = row.canEdit   ? `<button class="btn" onClick="fntEditInfo(this,${row.id_family})"><i class="fa-solid fa-pen-to-square"></i> Editar</button>` : "";
+                        let btnDelete = row.canDelete ? `<button class="btn" onClick="fntDelInfo(${row.id_family})"><i class="far fa-trash-alt"></i> Eliminar</button>` : "";
+
+                        return `
+                            <div class="btn-group pull-right">
+                                <button type="button" class="btn btn-sm dropdown-toggle bg-info" data-toggle="dropdown">
+                                    <i class="fa-solid fa-gear"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>${btnView}</li>
+                                    <li>${btnEdit}</li>
+                                    <li>${btnDelete}</li>
+                                </ul>
+                            </div>`;
+                    }
+                },
+                {"data":"names"},
+                {"data":"last_names"},
+                {
+                    "data":"status",
+                    "render": function(data){
+                        let badgeClass = data === "Activo" ? "badge-success" : "badge-danger";
+                        return `<span class="badge ${badgeClass}">${data}</span>`;
+                    }
+                }
             ],
             "responsive": false,
             "bDestroy": true,
@@ -197,7 +222,7 @@ function fntViewInfo(idpersona){
 }
 
 function fntEditInfo(element, idperson){
-    rowTable = element.parentNode.parentNode.parentNode.parentNode.parentNode;
+    rowTable = element.closest("tr");
     document.querySelector('#titleModal').innerHTML ="ACTUALIZAR FAMILIA";
     document.querySelector('.modal-header').classList.replace("headerRegister", "headerUpdate");
     document.querySelector('#btnActionForm').classList.replace("btn-primary", "btn-info");
@@ -212,12 +237,12 @@ function fntEditInfo(element, idperson){
             let objData = JSON.parse(request.responseText);
             if(objData.status)
             {
-                document.querySelector("#idFamily").value = objData.data.id_person;
+                document.querySelector("#idFamily").value = objData.data.id_family;
                 document.querySelector("#listAge").value =objData.data.legal_age;
                 $('#listAge').selectpicker('render');
                 document.querySelector("#txtIdentification").value = objData.data.identification;
-                document.querySelector("#txtName").value = objData.data.name;
-                document.querySelector("#txtLastName").value = objData.data.last_name;
+                document.querySelector("#txtName").value = objData.data.names;
+                document.querySelector("#txtLastName").value = objData.data.last_names;
                 document.querySelector("#txtRelationship").value = objData.data.relationship;
                 document.querySelector("#intPhone").value =objData.data.phone;
                 document.querySelector("#listStreetId").value =objData.data.street_id;
