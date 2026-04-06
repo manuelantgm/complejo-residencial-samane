@@ -155,6 +155,7 @@ class FamiliesModel extends Mysql
 					   phone,
 					   email,
 					   relationship,
+					   DATE_FORMAT(created_at, '%d-%m-%Y') AS created_at,
 					   status
 				FROM families
 				WHERE id_family = ? AND status != ?";

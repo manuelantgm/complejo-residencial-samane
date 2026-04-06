@@ -16,6 +16,35 @@
                 <div class="form-row">
                   <div class="form-group col-md-6">
                     <div class="form__field">
+                      <label class="form__label" for="listLocationid">Urbanización:</label>
+                      <select class="form-control form__input" data-live-search="true" id="listLocationid" name="listLocationid" required >
+                        <option value="0">--Seleccione--</option>
+                        <option value="1">Los Samanes</option>
+                        <option value="2">Samanes Residences</option>
+                        <option value="3">Altos de los Samanes</option>
+                      </select>
+                      <i class="fa-solid fa-map form__icon"></i>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <div class="form__field">
+                      <label class="form__label" for="nomenclaturaid">Nomenclatura:</label>
+                      <select class="form-control form__input" data-live-search="true" id="nomenclaturaid" name="nomenclaturaid" required >
+                        <option value="0">--Seleccione--</option>
+                        <option value="1">Solar</option>
+                        <option value="2">Construcción</option>
+                        <option value="3">Vivienda propia</option>
+                        <option value="4">Vivienda alquilada</option>
+                      </select>
+                      <i class="fa-solid fa-clipboard-list form__icon"></i>
+                    </div>
+                  </div>
+                  
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <div class="form__field">
                       <label class="form__label" for="txtIdentificacion">Identificacion</label>
                       <input type="text" 
                              data-inputmask="'mask': '999-9999999-9'"
@@ -24,6 +53,17 @@
                              id="txtIdentificacion" 
                              name="txtIdentificacion" 
                              placeholder="___-_______-_" />
+                      <i class="fa-solid fa-address-card form__icon"></i>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <div class="form__field">
+                      <label class="form__label" for="txtPassport">Número de pasaporte si aplica:</label>
+                      <input type="text"
+                             class="form__input" 
+                             id="txtPassport" 
+                             name="txtPassport" 
+                             placeholder="Escribe aqui..." />
                       <i class="fa-solid fa-address-card form__icon"></i>
                     </div>
                   </div>
@@ -49,18 +89,52 @@
                 <div class="form-row">
                   <div class="form-group col-md-6">
                     <div class="form__field">
-                      <label class="form__label" for="txtTelefono">Tel&eacute;fono</label>
-                      <input type="text" data-inputmask='"mask": "1+ (999) 999-9999"' data-mask class="form-control form__input" id="txtTelefono" name="txtTelefono" placeholder="Tel&eacute;fono" required="">
-                      <i class="fa-solid fa-phone form__icon"></i>
+                      <label class="form__label" for="street_id">Calle:</label>
+                      <select class="form-control form__input" data-live-search="true" id="street_id" name="street_id" required >
+                        <option value="0">--Seleccione--</option>
+                      </select>
+                      <i class="fa-solid fa-road form__icon"></i>
                     </div>
                   </div>
+                  <div class="form-group col-md-6">
+                    <div class="form__field">
+                      <label class="form__label" for="homeNumber">Número de casa:</label>
+                      <input type="number" class="form__input" id="homeNumber" name="homeNumber" placeholder="0" required="">
+                      <i class="fa-solid fa-hashtag form__icon"></i>
+                    </div>
+                  </div>
+                </div>
 
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <div class="form__field">
+                      <label class="form__label" for="txtCel">Celular:</label>
+                      <input type="text" data-inputmask='"mask": "1+ (999) 999-9999"' data-mask class="form-control form__input" id="txtCel" name="txtCel" placeholder="Tel&eacute;fono" required="">
+                      <i class="fa-solid fa-mobile-button form__icon"></i>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <div class="form__field">
+                      <label class="form__label" for="txtPhone">Teléfono casa:</label>
+                      <input type="text" data-inputmask='"mask": "1+ (999) 999-9999"' data-mask class="form-control form__input" id="txtPhone" name="txtPhone" placeholder="Tel&eacute;fono" required="">
+                      <i class="fa-solid fa-tty form__icon"></i>
+                    </div>
+                  </div>
+                </div>
 
+                <div class="form-row">
                   <div class="form-group col-md-6">
                     <div class="form__field">
                       <label class="form__label" for="txtEmail">Email</label>
                       <input type="text" class="form__input" id="txtEmail" name="txtEmail" placeholder="Email..." required="">
                       <i class="fa-solid fa-envelope form__icon"></i>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <div class="form__field">
+                      <label class="form__label" for="txtPassword">Contraseña</label>
+                      <input type="password" class="form__input" id="txtPassword" name="txtPassword" placeholder="Contraseña..." >
+                      <i class="fa-solid fa-lock form__icon"></i>
                     </div>
                   </div>
                 </div>
@@ -81,17 +155,7 @@
                         <option value="1">Activo</option>
                         <option value="2">Inactivo</option>
                       </select>
-                      <i class="fa-solid fa-user-tag form__icon"></i>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-6">
-                    <div class="form__field">
-                      <label class="form__label" for="txtPassword">Contraseña</label>
-                      <input type="password" class="form__input" id="txtPassword" name="txtPassword" placeholder="Contraseña..." >
-                      <i class="fa-solid fa-lock form__icon"></i>
+                      <i class="fa-solid fa-tag form__icon"></i>
                     </div>
                   </div>
                 </div>

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 {
                     "data": null,
                     "render": function(data, type, row){
-                        let btnView   = row.canView   ? `<button class="btn" onClick="fntViewFamily(${row.id_family})"><i class="far fa-eye"></i> Mas detalles</button>` : "";
+                        let btnView   = row.canView   ? `<button class="btn" onClick="fntViewInfo(${row.id_family})"><i class="far fa-eye"></i> Mas detalles</button>` : "";
                         let btnEdit   = row.canEdit   ? `<button class="btn" onClick="fntEditInfo(this,${row.id_family})"><i class="fa-solid fa-pen-to-square"></i> Editar</button>` : "";
                         let btnDelete = row.canDelete ? `<button class="btn" onClick="fntDelInfo(${row.id_family})"><i class="far fa-trash-alt"></i> Eliminar</button>` : "";
 
@@ -190,9 +190,9 @@ window.addEventListener('load', function() {
         fntCalles();
 }, false);
 
-function fntViewInfo(idpersona){
+function fntViewInfo(idfamily){
     let request = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-    let ajaxUrl = base_url+'/Families/getPropietario/'+idpersona;
+    let ajaxUrl = base_url+'/Families/getFamily/'+idfamily;
     request.open("GET",ajaxUrl,true);
     request.send();
     request.onreadystatechange = function(){
@@ -200,16 +200,13 @@ function fntViewInfo(idpersona){
             let objData = JSON.parse(request.responseText);
             if(objData.status)
             {
-                document.querySelector("#celIdentificacion").innerHTML = objData.data.identificacion;
-                document.querySelector("#celNombre").innerHTML = objData.data.nombres;
-                document.querySelector("#celApellido").innerHTML = objData.data.apellidos;
-                document.querySelector("#celTelefono").innerHTML = objData.data.telefono;
-                document.querySelector("#celEmail").innerHTML = objData.data.email_user;
-                document.querySelector("#celIde").innerHTML = objData.data.nit;
-                document.querySelector("#celNomFiscal").innerHTML = objData.data.nombrefiscal;
-                document.querySelector("#celDirFiscal").innerHTML = objData.data.direccionfiscal;
-                document.querySelector("#celFechaRegistro").innerHTML = objData.data.fechaRegistro; 
-                $('#modalViewCliente').modal('show');
+                document.querySelector("#celIdentification").innerHTML = objData.data.identification;
+                document.querySelector("#celPassport").innerHTML = objData.data.passport;
+                document.querySelector("#celNames").innerHTML = objData.data.names;
+                document.querySelector("#celLastNames").innerHTML = objData.data.last_names;
+                document.querySelector("#celPhone").innerHTML = objData.data.phone;
+                document.querySelector("#celDateCreated").innerHTML = objData.data.created_at; 
+                $('#modalViewFamily').modal('show');
             }else{
                 Swal.fire({
                   title: "ERROR",

@@ -98,3 +98,51 @@
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalViewFamily" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header header-primary">
+        <h5 class="modal-title" id="titleModal">Datos del empleado</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <td>Identificación:</td>
+              <td id="celIdentification"></td>
+            </tr>
+            <tr>
+              <td>Pasaporte:</td>
+              <td id="celPassport"></td>
+            </tr>
+            <tr>
+              <td>Nombres:</td>
+              <td id="celNames"></td>
+            </tr>
+            <tr>
+              <td>Apellidos:</td>
+              <td id="celLastNames"></td>
+            </tr>
+            <tr>
+              <td>Telefono:</td>
+              <td id="celPhone"></td>
+            </tr>
+            <tr>
+              <td>Fecha registro:</td>
+              <td id="celDateCreated"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
