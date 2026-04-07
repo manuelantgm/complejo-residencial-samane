@@ -32,7 +32,6 @@
 						   u.apellidos,
 						   u.telefono,
 						   u.email_user,
-						   u.direccion,
 						   r.idrol,
 						   r.nombrerol,
 						   u.image,

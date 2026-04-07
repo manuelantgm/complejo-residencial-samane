@@ -16,8 +16,8 @@
                 <div class="form-row">
                   <div class="form-group col-md-6">
                     <div class="form__field">
-                      <label class="form__label" for="listLocationid">Urbanización:</label>
-                      <select class="form-control form__input" data-live-search="true" id="listLocationid" name="listLocationid" required >
+                      <label class="form__label" for="intLocationid">Urbanización:</label>
+                      <select class="form-control form__input" data-live-search="true" id="intLocationid" name="intLocationid" required >
                         <option value="0">--Seleccione--</option>
                         <option value="1">Los Samanes</option>
                         <option value="2">Samanes Residences</option>
@@ -72,15 +72,15 @@
                 <div class="form-row">
                   <div class="form-group col-md-6">
                     <div class="form__field">
-                      <label class="form__label" for="txtNombre">Nombre</label>
-                      <input type="text" class="form__input" id="txtNombre" name="txtNombre" placeholder="Nombres del usuario" required="">
+                      <label class="form__label" for="txtNombres">Nombre</label>
+                      <input type="text" class="form__input" id="txtNombres" name="txtNombres" placeholder="Nombres del usuario" required="">
                       <i class="fa-solid fa-user-plus form__icon"></i>
                     </div>
                   </div>
                   <div class="form-group col-md-6">
                     <div class="form__field">
-                      <label class="form__label" for="txtApellido">Apellidos</label>
-                      <input type="text" class="form__input" id="txtApellido" name="txtApellido" placeholder="Apellidos del usuario" required="">
+                      <label class="form__label" for="txtApellidos">Apellidos</label>
+                      <input type="text" class="form__input" id="txtApellidos" name="txtApellidos" placeholder="Apellidos del usuario" required="">
                       <i class="fa-solid fa-user-plus form__icon"></i>
                     </div>
                   </div>
@@ -90,7 +90,7 @@
                   <div class="form-group col-md-6">
                     <div class="form__field">
                       <label class="form__label" for="street_id">Calle:</label>
-                      <select class="form-control form__input" data-live-search="true" id="street_id" name="street_id" required >
+                      <select class="form-control form__input" data-live-search="true" id="street_id" name="street_id" required>
                         <option value="0">--Seleccione--</option>
                       </select>
                       <i class="fa-solid fa-road form__icon"></i>
@@ -126,14 +126,14 @@
                   <div class="form-group col-md-6">
                     <div class="form__field">
                       <label class="form__label" for="txtEmail">Email</label>
-                      <input type="text" class="form__input" id="txtEmail" name="txtEmail" placeholder="Email..." required="">
+                      <input type="text" class="form__input" id="txtEmail" name="txtEmail" placeholder="Email..." required="" autocomplete="new-password">
                       <i class="fa-solid fa-envelope form__icon"></i>
                     </div>
                   </div>
                   <div class="form-group col-md-6">
                     <div class="form__field">
                       <label class="form__label" for="txtPassword">Contraseña</label>
-                      <input type="password" class="form__input" id="txtPassword" name="txtPassword" placeholder="Contraseña..." >
+                      <input type="password" class="form__input" id="txtPassword" name="txtPassword" placeholder="Contraseña..."  autocomplete="new-password">
                       <i class="fa-solid fa-lock form__icon"></i>
                     </div>
                   </div>

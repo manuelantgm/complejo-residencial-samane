@@ -31,7 +31,7 @@
 			$anio = date('Y');
 			$mes = date('m');
 			if( $_SESSION['userData']['idrol'] == RPROPIETARIOS ){
-				$this->views->getView($this,"dashboardCliente",$data);
+				$this->views->getView($this,"dashboard",$data);
 			}else{
 				$this->views->getView($this,"dashboard",$data);
 			}

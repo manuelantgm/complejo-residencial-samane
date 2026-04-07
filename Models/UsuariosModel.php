@@ -4,61 +4,134 @@
 	{
 		private $intIdUsuario;
 		private $strIdentificacion;
+		private $strPassport;
 		private $strNombre;
 		private $strLastname;
 		private $strDireccion;
 		private $strApellido;
 		private $intTelefono;
+		private $intCell;
 		private $strEmail;
 		private $strPassword;
-		private $strToken;
+		private $intLocationId;
+		private $intStreetId;
+		private $intHomeNumber;
 		private $intTipoId;
 		private $intStatus;
-		private $strNit;
-		private $strNomFiscal;
-		private $strDirFiscal;
 
 		public function __construct()
 		{
 			parent::__construct();
 		}	
 
-		public function insertUsuario(string $nombre, string $telefono, string $email, string $password, int $tipoid, int $status){
-			$this->strNombre = $nombre;
-			$this->intTelefono = $telefono;
+		public function insertUsuario(string $identification,
+									  string $passport,
+									  string $name, 
+									  string $lastname,
+									  int $tel,
+									  int $cell,
+									  string $email, 
+									  string $password, 
+									  int $location,
+									  int $streetid,
+									  int $homenumber,
+									  int $tipoid, 
+									  int $status){
+			$this->strIdentificacion = $identification;
+			$this->strPassport = $passport;
+			$this->strNombre = $name;
+			$this->strLastname = $lastname;
+			$this->intTelefono = $tel;
+			$this->intCell = $cell;
 			$this->strEmail = $email;
 			$this->strPassword = $password;
+			$this->intLocationId = $location;
+			$this->intStreetId = $streetid;
+			$this->intHomeNumber = $homenumber;
 			$this->intTipoId = $tipoid;
 			$this->intStatus = $status;
 			$return = 0;
 
-			$sql = "SELECT * FROM usuarios WHERE 
-					email_user = '{$this->strEmail}' ";
-			$request = $this->select_all($sql);
+			// Validar identificación duplicada solo si fue enviada
+			if (!empty($this->strIdentificacion)) {
+				$sql = "SELECT idusuario 
+						FROM usuarios 
+						WHERE identificacion = ? 
+						AND status != 0
+						LIMIT 1";
 
-			if(empty($request))
-			{
-				$query_insert  = "INSERT INTO usuarios(nombres,
-													  telefono,
-													  email_user,
-													  password,
-													  calleid,
-													  rolid,
-													  status) 
-								  VALUES(?,?,?,?,?,?,?)";
-	        	$arrData = array($this->strNombre,
-        						$this->intTelefono,
-        						$this->strEmail,
-        						$this->strPassword,
-        						$this->intStatus,
-        						$this->intTipoId,
-        						$this->intStatus);
-	        	$request_insert = $this->insert($query_insert,$arrData);
-	        	$return = $request_insert;
-			}else{
-				$return = "exist";
+				$requestIdentification = $this->select($sql, [$this->strIdentificacion]);
+
+				if (!empty($requestIdentification)) {
+					return "identificacionExist";
+				}
 			}
-	        return $return;
+
+			// Validar identificación duplicada solo si fue enviada
+			if (!empty($this->strPassport)) {
+				$sql = "SELECT idusuario 
+						FROM usuarios 
+						WHERE passport = ? 
+						AND status != 0
+						LIMIT 1";
+
+				$requestPassport = $this->select($sql, [$this->strPassport]);
+
+				if (!empty($requestPassport)) {
+					return "passportExist";
+				}
+			}
+
+			// Validar identificación duplicada solo si fue enviada
+			if (!empty($this->strEmail)) {
+				$sql = "SELECT idusuario 
+						FROM usuarios 
+						WHERE email_user = ? 
+						AND status != 0
+						LIMIT 1";
+
+				$requestEmail = $this->select($sql, [$this->strEmail]);
+
+				if (!empty($requestEmail)) {
+					return "emailExist";
+				}
+			}
+	
+			$query_insert  = "INSERT INTO usuarios(identificacion,
+													passport,
+													nombres,
+													apellidos,
+													telefono,
+													celular,
+													email_user,
+													password,
+													stage_id,
+													calleid,
+													home_number,
+													rolid,
+													status) 
+								VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			$arrData = array($this->strIdentificacion,
+							 $this->strPassport,
+							 $this->strNombre,
+							 $this->strLastname,
+							 $this->intTelefono,
+							 $this->intCell,
+							 $this->strEmail,
+							 $this->strPassword,
+							 $this->intLocationId,
+							 $this->intStreetId,
+							 $this->intHomeNumber,
+							 $this->intTipoId,
+							 $this->intStatus);
+			$request_insert = $this->insert($query_insert,$arrData);
+			
+	        if (!empty($request_insert)) {
+				$return = $request_insert;
+			} else {
+				$return = false;
+			}
+			return $return;
 		}
 
 		public function selectUsuarios()
@@ -116,23 +189,33 @@
 					$sql = "UPDATE usuarios SET identificacion=?, nombres=?, apellidos=?, telefono=?, email_user=?, password=?, rolid=?, status=? 
 							WHERE idusuario = $this->intIdUsuario ";
 					$arrData = array($this->strIdentificacion,
-									$this->strNombre,
+									$this->strPassport,
 									$this->strLastname,
-	        						$this->intTelefono,
-	        						$this->strEmail,
-	        						$this->strPassword,
-	        						$this->intTipoId,
-	        						$this->intStatus);
+									$this->strNombre,
+									$this->intTelefono,
+									$this->intCell,
+									$this->strEmail,
+									$this->strPassword,
+									$this->intLocationId,
+									$this->intStreetId,
+									$this->intHomeNumber,
+									$this->intTipoId,
+									$this->intStatus);
 				}else{
 					$sql = "UPDATE usuarios SET identificacion=?, nombres=?, apellidos=?, telefono=?, email_user=?, rolid=?, status=? 
 							WHERE idusuario = $this->intIdUsuario ";
 					$arrData = array($this->strIdentificacion,
-									$this->strNombre,
+									$this->strPassport,
 									$this->strLastname,
-	        						$this->intTelefono,
-	        						$this->strEmail,
-	        						$this->intTipoId,
-	        						$this->intStatus);
+									$this->strNombre,
+									$this->intTelefono,
+									$this->intCell,
+									$this->strEmail,
+									$this->intLocationId,
+									$this->intStreetId,
+									$this->intHomeNumber,
+									$this->intTipoId,
+									$this->intStatus);
 				}
 				$request = $this->update($sql,$arrData);
 			}else{

@@ -46,5 +46,22 @@
 			}
 			die();		
 		}
+
+		public function getStreetsByStage()
+		{
+			if($_POST){
+				$stage_id = intval($_POST['stage_id']);
+
+				$arrData = [];
+
+				if($stage_id > 0){
+					$arrData = $this->model->selectStreetsByStage($stage_id);
+				}
+
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode($arrData, JSON_UNESCAPED_UNICODE);
+				die();
+			}
+		}
 	}
  ?>

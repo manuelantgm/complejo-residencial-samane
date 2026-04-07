@@ -60,13 +60,14 @@ document.addEventListener('DOMContentLoaded', function(){
         let formUsuario = document.querySelector("#formUsuario");
         formUsuario.onsubmit = function(e) {
             e.preventDefault();
-            let strNombre = document.querySelector('#txtNombre').value;
-            let strLastname = document.querySelector('#txtApellido').value;
-            let strTelefono = document.querySelector('#txtTelefono').value;
+            let strNombre = document.querySelector('#txtNombres').value;
+            let strLastname = document.querySelector('#txtApellidos').value;
+            let strTelefono = document.querySelector('#txtPhone').value;
+            let strCel = document.querySelector('#txtCel').value;
             let strEmail = document.querySelector('#txtEmail').value;
             let intTipousuario = document.querySelector('#listRolid').value;
             let intStatus = document.querySelector('#listStatus').value;
-            let strPassword = document.querySelector('#txtPassword').value;
+            
             
 
             if(strNombre == '' || strTelefono == '' || strEmail == '' || intTipousuario == '')
@@ -308,8 +309,45 @@ document.addEventListener('DOMContentLoaded', function(){
 }, false);
 
 window.addEventListener('load', function() {
-        fntRolesUsuario();
+    fntRolesUsuario();
 }, false);
+
+document.querySelector('#intLocationid').addEventListener('change', function () {
+    let stage_id = this.value;
+    let select = document.querySelector('#street_id');
+
+    if(stage_id == 0){
+        select.innerHTML = `<option value="0">--Seleccione--</option>`;
+        $('#street_id').selectpicker('destroy');
+        $('#street_id').selectpicker();
+        return;
+    }
+
+    fetch(base_url + '/Streets/getStreetsByStage', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'stage_id=' + encodeURIComponent(stage_id)
+    })
+    .then(res => res.json())
+    .then(objData => {
+        let htmlOptions = `<option value="0">--Seleccione--</option>`;
+
+        objData.forEach(item => {
+            htmlOptions += `
+                <option value="${item.id_street}">
+                    ${item.street}
+                </option>`;
+        });
+
+        select.innerHTML = htmlOptions;
+
+        $('#street_id').selectpicker('destroy');
+        $('#street_id').selectpicker();
+    })
+    .catch(err => console.error(err));
+});
 
 function fntRolesUsuario(){
     if(document.querySelector('#listRolid')){

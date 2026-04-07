@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function(){
         formFamily.onsubmit = function(e) {
             e.preventDefault();
             let intListAge = document.querySelector('#listAge').value;
-            let intIdentification = document.querySelector('#txtIdentification').value;
+            let strIdentification = document.querySelector('#txtIdentification').value;
+            let strPassport = document.querySelector('#txtPassport').value;
             let strName = document.querySelector('#txtName').value;
             let strLastName = document.querySelector('#txtLastName').value;
             let strRelationship = document.querySelector('#txtRelationship').value;
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 return false;
             }
 
-            if(intListAge == 1 && intIdentification == ''){
+            if(intListAge == 1 && (!strIdentification?.trim() && !strPassport?.trim())){
                 Swal.fire({
                   title: "Atención!",
                   text: "Por favor indique la identificacion del familiar.",
@@ -187,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function(){
 }, false);
 
 window.addEventListener('load', function() {
-        fntCalles();
+    fntCalles();
 }, false);
 
 function fntViewInfo(idfamily){

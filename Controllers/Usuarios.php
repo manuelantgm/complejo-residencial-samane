@@ -27,18 +27,25 @@
 
 		public function setUsuario(){
 			if($_POST){
-				if(empty($_POST['txtNombre']) || empty($_POST['txtTelefono']) || empty($_POST['txtEmail']) || empty($_POST['listRolid']) || empty($_POST['listStatus']) )
+				if(empty($_POST['txtNombres']) || empty($_POST['txtApellidos']) || empty($_POST['txtPhone']) || empty($_POST['txtEmail']) || empty($_POST['listRolid']) || empty($_POST['listStatus']) )
 				{
 					$arrResponse = array("status" => false, "msg" => 'Datos incorrectos.');
 				}else{ 
 					$idUsuario = intval($_POST['idUsuario']);
-					$intIdentification =  preg_replace('/[^0-9]/', '',strClean($_POST['txtIdentificacion']));
-					$strName = strtoupper(strClean($_POST['txtNombre']));
+					$intLocationId = intval($_POST['intLocationid']);
+					$intnomenclature = intval($_POST['nomenclaturaid']);
+					$strIdentification = preg_replace('/[^0-9]/', '',strClean($_POST['txtIdentificacion']));
+					$strPassport = strtoupper(strClean($_POST['txtPassport']));
+					$strName = strtoupper(strClean($_POST['txtNombres']));
 					$strLastname = strtoupper(strClean($_POST['txtApellidos']));
-					$intTelefono =  preg_replace('/[^0-9]/', '',strClean($_POST['txtTelefono']));
+					$intStreetId = intval($_POST['street_id']);
+					$intHomeNumber = intval($_POST['homeNumber']);
+					$intCell = preg_replace('/[^0-9]/', '',strClean($_POST['txtCel']));
+					$intTel = preg_replace('/[^0-9]/', '',strClean($_POST['txtPhone']));
 					$strEmail = strtolower(strClean($_POST['txtEmail']));
 					$intTipoId = intval(strClean($_POST['listRolid']));
 					$intStatus = intval(strClean($_POST['listStatus']));
+
 					$request_user = "";
 					if($idUsuario == 0)
 					{
@@ -46,12 +53,17 @@
 						$strPassword =  empty($_POST['txtPassword']) ? hash("SHA256",passGenerator()) : hash("SHA256",$_POST['txtPassword']);
 
 						if($_SESSION['permisosMod']['w']){
-							$request_user = $this->model->insertUsuario($intIdentification,
+							$request_user = $this->model->insertUsuario($strIdentification,
+																		$strPassport,
 																		$strName,
 																		$strLastname, 
-																		$intTelefono, 
+																		$intTel, 
+																		$intCell,
 																		$strEmail,
-																		$strPassword, 
+																		$strPassword,
+																		$intLocationId,
+																		$intStreetId,
+																		$intHomeNumber,
 																		$intTipoId, 
 																		$intStatus);
 						}
@@ -60,12 +72,17 @@
 						$strPassword =  empty($_POST['txtPassword']) ? "" : hash("SHA256",$_POST['txtPassword']);
 						if($_SESSION['permisosMod']['u']){
 							$request_user = $this->model->updateUsuario($idUsuario, 
-																		$intIdentification,
+																		$strIdentification,
+																		$strPassport,
 																		$strName,
 																		$strLastname, 
-																		$intTelefono, 
+																		$intTel, 
+																		$intCell,
 																		$strEmail,
-																		$strPassword, 
+																		$strPassword,
+																		$intLocationId,
+																		$intStreetId,
+																		$intHomeNumber,
 																		$intTipoId, 
 																		$intStatus);
 						}
@@ -79,8 +96,12 @@
 						}else{
 							$arrResponse = array('status' => true, 'msg' => 'Datos Actualizados correctamente.');
 						}
-					}else if($request_user == 'exist'){
-						$arrResponse = array('status' => false, 'msg' => '¡Atención! el email o la identificación ya existe, ingrese otro.');		
+					}else if($request_user == 'emailExist'){
+						$arrResponse = array('status' => false, 'msg' => '¡Atención! el email ya existe.');		
+					}else if($request_user == 'identificacionExist'){
+						$arrResponse = array('status' => false, 'msg' => '¡Atención! la identificación ya existe.');		
+					}else if($request_user == 'passportExist'){
+						$arrResponse = array('status' => false, 'msg' => '¡Atención! el passaporte ya existe.');	
 					}else{
 						$arrResponse = array("status" => false, "msg" => 'No es posible almacenar los datos.');
 					}

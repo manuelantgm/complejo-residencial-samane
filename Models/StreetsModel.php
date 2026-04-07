@@ -22,5 +22,14 @@
 			$request = $this->select_all($sql, [$idUsuario]);
         	return $request;
 		}
+
+		public function selectStreetsByStage(int $stage_id)
+		{
+			$sql = "SELECT id_street, street, status
+					FROM streets
+					WHERE status = 1 AND stage_id = ?";
+			$request = $this->select_all($sql, [$stage_id]);
+			return $request;
+		}
 	}
  ?>

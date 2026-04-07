@@ -45,7 +45,7 @@ class FamiliesModel extends Mysql
 		$this->strPassport = $passport;
 		$this->intIdStreet = $streetid;
 		$this->intHomeNumber = $homenumber;
-		$this->strPhone = $phone;
+		$this->intPhone = $phone;
 		$this->strEmail = $email;
 		$this->strPassword = $password;
 		$this->strRelationship = $relationship;
@@ -115,7 +115,7 @@ class FamiliesModel extends Mysql
 			$this->strPassport,
 			$this->intIdStreet,
 			$this->intHomeNumber,
-			$this->strPhone,
+			$this->intPhone,
 			$this->strEmail,
 			$this->strPassword,
 			$this->strRelationship
