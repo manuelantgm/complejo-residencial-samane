@@ -7,6 +7,7 @@ class FamiliesModel extends Mysql
 	private $strLastName;
 	private $strIdentification;
 	private $strPassport;
+	private $strAwmDocument;
 	private $intIdStreet;
 	private $intHomeNumber;
 	private $intPhone;
@@ -148,12 +149,12 @@ class FamiliesModel extends Mysql
 					   legal_age,
 					   names,
 					   last_names,
-					   identification,
-					   passport,
+					   IFNULL(identification, '') AS identification,
+					   IFNULL(passport, '') AS passport,
 					   street_id,
 					   home_number,
-					   phone,
-					   email,
+					   IFNULL(phone, '') AS phone,
+					   IFNULL(email, '') AS email,
 					   relationship,
 					   DATE_FORMAT(created_at, '%d-%m-%Y') AS created_at,
 					   status
@@ -162,124 +163,233 @@ class FamiliesModel extends Mysql
 		$request = $this->select($sql,[$this->intFamilyId,0]);
 		return $request;
 	}
+	public function updateFamily(
+		int $idperson,
+		int $legalage,
+		string $name,
+		string $lastname,
+		?string $identification,
+		?string $passport,
+		int $streetid,
+		int $homenumber,
+		int $phone,
+		string $email,
+		string $password,
+		string $relationship
+	) {
+		$this->intIdFamily       = $idperson;
+		$this->intLegalAge       = $legalage;
+		$this->strName           = trim($name);
+		$this->strLastName       = trim($lastname);
+		$this->strCedula = (isset($identification) && trim($identification) !== '') ? trim($identification) : null;
+		$this->strPassport       = (isset($passport) && trim($passport) !== '') ? trim($passport) : null;
+		$this->intIdStreet       = $streetid;
+		$this->intHomeNumber     = $homenumber;
+		$this->intPhone          = $phone;
+		$this->strEmail          = trim($email);
+		$this->strPassword       = trim($password);
+		$this->strRelationship   = trim($relationship);
 
-	public function updateFamily(int $idperson,
-								 int $legalage,
-								 string $name, 
-								 string $lastname,
-								 string $identification,
-								 string $passport,
-								 int $streetid,
-								 int $homenumber, 
-								 int $phone,
-								 string $email, 
-								 string $password,
-								 string $relationship) {
-		$this->intIdFamily = $idperson;
-		$this->intLegalAge = $legalage;
-		$this->strName = $name;
-		$this->strLastName = $lastname;
-		$this->strIdentification = $identification;
-		$this->strPassport = $passport;
-		$this->intIdStreet = $streetid;
-		$this->intHomeNumber = $homenumber;
-		$this->intPhone = $phone;
-		$this->strEmail = $email;
-		$this->strPassword = $password;
-		$this->strRelationship = $relationship;
+		try {
+			/*
+			* ==========================================
+			* VALIDAR EMAIL DUPLICADO EN CRS
+			* ==========================================
+			*/
+			if ($this->strEmail !== '') {
+				$sql = "SELECT id_family
+						FROM families
+						WHERE email = ?
+						AND id_family != ?
+						LIMIT 1";
 
-		$sql = "SELECT * FROM families WHERE (email = '{$this->strEmail}' AND id_family != $this->intIdFamily)
-										   AND id_family != $this->intIdFamily ";
-		$request = $this->select_all($sql);
+				$requestEmail = $this->select($sql, [$this->strEmail, $this->intIdFamily], 'crs');
 
-		// Validar identificación duplicada
-		if (!empty($identification)) {
-			$sql = "SELECT id_family
+				if (!empty($requestEmail)) {
+					return "emailExist";
+				}
+			}
+
+			/*
+			* ==========================================
+			* VALIDAR IDENTIFICACIÓN DUPLICADA EN CRS
+			* ==========================================
+			*/
+			if ($this->strIdentification !== null) {
+				$sql = "SELECT id_family
+						FROM families
+						WHERE identification = ?
+						AND id_family != ?
+						AND status != 0
+						LIMIT 1";
+
+				$exists = $this->select($sql, [$this->strIdentification, $this->intIdFamily], 'crs');
+
+				if (!empty($exists)) {
+					return "identificacionExist";
+				}
+			}
+
+			/*
+			* ==========================================
+			* VALIDAR PASAPORTE DUPLICADO EN CRS
+			* ==========================================
+			*/
+			if ($this->strPassport !== null) {
+				$sql = "SELECT id_family
+						FROM families
+						WHERE passport = ?
+						AND id_family != ?
+						AND status != 0
+						LIMIT 1";
+
+				$exists = $this->select($sql, [$this->strPassport, $this->intIdFamily], 'crs');
+
+				if (!empty($exists)) {
+					return "passportExist";
+				}
+			}
+
+			/*
+			* ==========================================
+			* BUSCAR IDENTIFICACIÓN ANTERIOR EN CRS
+			* Para actualizar en AWM usando la identificación vieja
+			* ==========================================
+			*/
+			$sqlOld = "SELECT identification
 					FROM families
-					WHERE identification = ?
-					AND id_family != ?
-					AND status != 0
+					WHERE id_family = ?
 					LIMIT 1";
 
-			$exists = $this->select($sql, [$identification, $this->intIdFamily]);
+			$oldFamily = $this->select($sqlOld, [$this->intIdFamily], 'crs');
 
-			if (!empty($exists)) {
-				return "identificacionExist";
+			if (empty($oldFamily)) {
+				return false;
 			}
-		}
 
-		// Validar passport duplicado
-		if (!empty($this->strPassport)) {
-			$sql = "SELECT id_family
-					FROM families
-					WHERE passport = ?
-					AND id_family != ?
-					AND status != 0
-					LIMIT 1";
+			$oldIdentification = !empty($oldFamily['identification']) ? trim($oldFamily['identification']) : null;
 
-			$exists = $this->select($sql, [$this->strPassport, $this->intIdFamily]);
+			/*
+			* ==========================================
+			* INICIAR TRANSACCIONES
+			* ==========================================
+			*/
+			$this->begin('crs');
+			$this->begin('awm');
 
-			if (!empty($exists)) {
-				return "passportExist";
+			/*
+			* ==========================================
+			* UPDATE EN CRS - families
+			* ==========================================
+			*/
+			if ($this->strPassword !== "") {
+				$sqlCrs = "UPDATE families SET
+							legal_age = ?,
+							names = ?,
+							last_names = ?,
+							identification = ?,
+							passport = ?,
+							street_id = ?,
+							home_number = ?,
+							phone = ?,
+							email = ?,
+							password = ?,
+							relationship = ?
+						WHERE id_family = ?";
+
+				$arrDataCrs = [
+					$this->intLegalAge,
+					$this->strName,
+					$this->strLastName,
+					$this->strIdentification,
+					$this->strPassport,
+					$this->intIdStreet,
+					$this->intHomeNumber,
+					$this->intPhone,
+					$this->strEmail,
+					$this->strPassword,
+					$this->strRelationship,
+					$this->intIdFamily
+				];
+			} else {
+				$sqlCrs = "UPDATE families SET
+							legal_age = ?,
+							names = ?,
+							last_names = ?,
+							identification = ?,
+							passport = ?,
+							street_id = ?,
+							home_number = ?,
+							phone = ?,
+							email = ?,
+							relationship = ?
+						WHERE id_family = ?";
+
+				$arrDataCrs = [
+					$this->intLegalAge,
+					$this->strName,
+					$this->strLastName,
+					$this->strIdentification,
+					$this->strPassport,
+					$this->intIdStreet,
+					$this->intHomeNumber,
+					$this->intPhone,
+					$this->strEmail,
+					$this->strRelationship,
+					$this->intIdFamily
+				];
 			}
-		}
 
-		if(empty($request)){
-			if($this->strPassword  != "")
-			{
-				$sql = "UPDATE families SET legal_age = ?,
-											names = ?,
-											last_names = ?,
-											identification = ?,
-											passport = ?,
-											street_id = ?,
-											home_number = ?,
-											phone = ?,
-											email = ?,
-											password = ?,
-											relationship = ?
+			$requestCrs = $this->update($sqlCrs, $arrDataCrs, 'crs');
 
-				WHERE id_family = $this->intIdFamily ";
-				$arrData = array($this->intLegalAge,
-								$this->strName,
-								$this->strLastName,
-								$this->strIdentification,
-								$this->strPassport,
-								$this->intIdStreet,
-								$this->intHomeNumber,
-								$this->intPhone,
-								$this->strEmail,
-								$this->strPassword,
-								$this->strRelationship);
-			}else{
-				$sql = "UPDATE families SET legal_age = ?,
-								    names = ?,
-									last_names = ?,
-									identification = ?,
-									passport = ?,
-									street_id = ?,
-									home_number = ?,
-									phone = ?,
-									email = ?,
-									relationship = ?
-
-				WHERE id_family = $this->intIdFamily ";
-				$arrData = array($this->intLegalAge,
-								$this->strName,
-								$this->strLastName,
-								$this->strIdentification,
-								$this->strPassport,
-								$this->intIdStreet,
-								$this->intHomeNumber,
-								$this->intPhone,
-								$this->strEmail,
-								$this->strRelationship);
+			if (!$requestCrs) {
+				throw new Exception('No fue posible actualizar en CRS.');
 			}
-			$request = $this->update($sql,$arrData);
-		}else{
-			$request = "exist";
+
+			/*
+			* ==========================================
+			* UPDATE EN AWM - usuarios_frecuentes
+			* Solo nombre, apellido e identificación
+			* Buscando por la identificación anterior
+			* ==========================================
+			*/
+			if ($oldIdentification !== null) {
+				$sqlAwm = "UPDATE usuarios_frecuentes SET
+							CEDULA = ?
+							NOMBRES = ?,
+							APELLIDOS = ?,
+						WHERE CEDULA = ?";
+
+				$arrDataAwm = [
+					$this->strAwmDocument,
+					$this->strName,
+					$this->strLastName
+				];
+
+				$requestAwm = $this->update($sqlAwm, $arrDataAwm, 'awm');
+
+				if ($requestAwm === false) {
+					throw new Exception('No fue posible actualizar en AWM.');
+				}
+			}
+
+			$this->commitDb('crs');
+			$this->commitDb('awm');
+
+			return true;
+
+		} catch (Exception $e) {
+			if ($this->inTransactionDb('crs')) {
+				$this->rollBackDb('crs');
+			}
+
+			if ($this->inTransactionDb('awm')) {
+				$this->rollBackDb('awm');
+			}
+
+			error_log('Error updateFamily: ' . $e->getMessage());
+			return false;
 		}
-		return $request;
 	}
 
 	public function deleteFamily(int $intidfamily)

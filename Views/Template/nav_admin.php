@@ -65,7 +65,7 @@
           <?php if(!empty($_SESSION['permisos'][MEMPLOYEES]['r'])){ ?>
           <li class="nav-item">
             <a href="<?= base_url(); ?>/crs/empleados" class="nav-link <?php if($data['page_name'] == "employees"){echo "active";} ?>">
-              <i class="fa-solid fa-list-check nav-icon"></i>
+              <i class="fa-solid fa-people-carry-box nav-icon"></i>
               <p>Empleados</p>
             </a>
           </li>

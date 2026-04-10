@@ -51,37 +51,43 @@
                       <div class="active tab-pane" id="activity">
                         <form id="formPerfil" name="formPerfil" class="form-horizontal">
                           <div class="form-group row">
-                            <label for="txtNombre" class="col-sm-2 col-form-label">Nombres</label>
+                            <label for="txtNombre" class="col-sm-2 col-form-label">Nombres:</label>
                             <div class="col-sm-10">
                               <input type="text" class="form-control" id="txtNombre" name="txtNombre" value="<?= $_SESSION['userData']['nombres']; ?>" placeholder="Nombre">
                             </div>
                           </div>
                           <div class="form-group row">
-                            <label for="txtApellidos" class="col-sm-2 col-form-label">Apellidos</label>
+                            <label for="txtApellidos" class="col-sm-2 col-form-label">Apellidos:</label>
                             <div class="col-sm-10">
                               <input type="text" class="form-control" id="txtApellidos" name="txtApellidos" value="<?= $_SESSION['userData']['apellidos']; ?>" placeholder="Nombre">
                             </div>
                           </div>
                           <div class="form-group row">
-                            <label for="txtTelefono" class="col-sm-2 col-form-label">Telefono</label>
+                            <label for="txtTelefono" class="col-sm-2 col-form-label">Teléfono casa:</label>
                             <div class="col-sm-10">
                               <input type="text" data-inputmask='"mask": "1+ (999) 999-9999"' data-mask class="form-control" id="txtTelefono" name="txtTelefono" value="<?= $_SESSION['userData']['telefono']; ?>" placeholder="Telefono">
                             </div>
                           </div>
                           <div class="form-group row">
-                            <label for="txtEmail" class="col-sm-2 col-form-label">Correo electronico</label>
+                            <label for="txtTelefono" class="col-sm-2 col-form-label">Celular:</label>
+                            <div class="col-sm-10">
+                              <input type="text" data-inputmask='"mask": "1+ (999) 999-9999"' data-mask class="form-control" id="txtcelular" name="txtcelular" value="<?= $_SESSION['userData']['celular']; ?>" placeholder="celular">
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label for="txtEmail" class="col-sm-2 col-form-label">Correo electronico:</label>
                             <div class="col-sm-10">
                               <input type="text" class="form-control" id="txtEmail" name="txtEmail" value="<?= $_SESSION['userData']['email_user']; ?>" placeholder="Correo electronico">
                             </div>
                           </div>
                           <div class="form-group row">
-                            <label for="txtPassword" class="col-sm-2 col-form-label">Contraseña</label>
+                            <label for="txtPassword" class="col-sm-2 col-form-label">Contraseña:</label>
                             <div class="col-sm-10">
                               <input type="password" class="form-control" id="txtPassword" name="txtPassword" placeholder="***">
                             </div>
                           </div>
                           <div class="form-group row">
-                            <label for="txtPasswordConfirm" class="col-sm-2 col-form-label">Confirmar Contraseña</label>
+                            <label for="txtPasswordConfirm" class="col-sm-2 col-form-label">Confirmar Contraseña:</label>
                             <div class="col-sm-10">
                               <input type="password" class="form-control" id="txtPasswordConfirm" name="txtPasswordConfirm" placeholder="***">
                             </div>

@@ -1,65 +1,67 @@
-<?php 
-	class Mysql extends Conexion
-	{
-		private $arrValues;	
-		private $conexion;
-		private $strquery;	
+<?php
 
-		function __construct()
-		{
-			$this->conexion = new Conexion();
-			$this->conexion = $this->conexion->conect();
-		}
+class Mysql extends Conexion
+{
+    private $arrValues;
+    private $strquery;
 
-		//Insertar un registro
-		public function insert(string $query, array $arrValues)
-		{
-			$this->strquery = $query;
-			$this->arrValues = $arrValues;
-        	$insert = $this->conexion->prepare($this->strquery);
-        	$resInsert = $insert->execute($this->arrValues);
-        	if($resInsert)
-	        {
-	        	$lastInsert = $this->conexion->lastInsertId();
-	        }else{
-	        	$lastInsert = 0;
-	        }
-	        return $lastInsert; 
-		}
-		//Busca un registro
-		public function select(string $query, array $params = [])
-		{
-		    $this->strquery = $query;
-		    $stmt = $this->conexion->prepare($this->strquery);
-		    $stmt->execute($params);
-		    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-		    return $data;
-		}
-		//Devuelve todos los registros
-		public function select_all(string $query, array $params = [])
-		{
-		    $this->strquery = $query;
-		    $stmt = $this->conexion->prepare($this->strquery);
-		    $stmt->execute($params);
-		    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		    return $data;
-		}
-		//Actualiza registros
-		public function update(string $query, array $arrValues)
-		{
-			$this->strquery = $query;
-			$this->arrValues = $arrValues;
-			$update = $this->conexion->prepare($this->strquery);
-			$resExecute = $update->execute($this->arrValues);
-	        return $resExecute;
-		}
-		//Eliminar un registros
-		public function delete(string $query, array $params = [])
-		{
-			$this->strquery = $query;
-			$stmt = $this->conexion->prepare($this->strquery);
-			$del = $stmt->execute($params);
-			return $del;
-		}
-	}
- ?>
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function insert(string $query, array $arrValues, string $connection = 'crs')
+    {
+        $this->strquery = $query;
+        $this->arrValues = $arrValues;
+
+        $db = $this->getDb($connection);
+        $insert = $db->prepare($this->strquery);
+        $resInsert = $insert->execute($this->arrValues);
+
+        return $resInsert ? $db->lastInsertId() : 0;
+    }
+
+    public function select(string $query, array $params = [], string $connection = 'crs')
+    {
+        $this->strquery = $query;
+
+        $db = $this->getDb($connection);
+        $stmt = $db->prepare($this->strquery);
+        $stmt->execute($params);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function select_all(string $query, array $params = [], string $connection = 'crs')
+    {
+        $this->strquery = $query;
+
+        $db = $this->getDb($connection);
+        $stmt = $db->prepare($this->strquery);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function update(string $query, array $arrValues, string $connection = 'crs')
+    {
+        $this->strquery = $query;
+        $this->arrValues = $arrValues;
+
+        $db = $this->getDb($connection);
+        $update = $db->prepare($this->strquery);
+
+        return $update->execute($this->arrValues);
+    }
+
+    public function delete(string $query, array $params = [], string $connection = 'crs')
+    {
+        $this->strquery = $query;
+
+        $db = $this->getDb($connection);
+        $stmt = $db->prepare($this->strquery);
+
+        return $stmt->execute($params);
+    }
+}

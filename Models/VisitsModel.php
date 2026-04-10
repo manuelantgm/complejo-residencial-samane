@@ -4,11 +4,10 @@ class VisitsModel extends Mysql
 	private $intIdUser;
 	private $strName;
 	private $strLastName;
-	private $intIdentification;
+	private $strIdentification;
     private $strPassport;
 
 	private $intVisitId;
-	private $strRelationship;
 
 	public function __construct()
 	{
@@ -18,8 +17,8 @@ class VisitsModel extends Mysql
 	public function insertVisit(int $userId,
                                    string $name,
                                    string $lastName,
-                                   string $identification,
-                                   string $passport
+                                   ?string $identification,
+                                   ?string $passport
                                 ) {
         $this->intIdUser         = $userId;
         $this->strName           = $name;

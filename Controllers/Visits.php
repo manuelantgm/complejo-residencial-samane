@@ -3,7 +3,7 @@
 	use Spipu\Html2Pdf\Html2Pdf;
 	require 'Libraries/NumbreToLetter/numberToLetter.php';
 	class Visits extends Controllers{
-		private $db;
+
 		public function __construct()
 		{
 			parent::__construct();
@@ -15,8 +15,6 @@
 				die();
 			}
 			getPermisos(MEMPLOYEES);
-			// Instancia de conexión
-			$this->db = new Conexion();
 		}
 
 		public function view()
@@ -116,13 +114,13 @@
             $idVisit = isset($post['idVisit']) ? intval($post['idVisit']) : 0;
             $idUser = isset($_SESSION['idUser']) ? intval($_SESSION['idUser']) : 0;
 
-            $identification = isset($post['txtIdentification'])
-                ? preg_replace('/[^0-9]/', '', strClean($post['txtIdentification']))
-                : '';
+            $identification = (!empty($post['txtIdentification']) && trim($post['txtIdentification']) !== '')
+            ? preg_replace('/[^0-9]/', '', strClean($post['txtIdentification']))
+            : null;
 
-            $passport = isset($post['txtPassport'])
-                ? strtoupper(trim(strClean($post['txtPassport'])))
-                : '';
+            $passport = isset($post['txtPassport']) && trim($post['txtPassport']) !== ''
+            ? strtoupper(trim(strClean($post['txtPassport'])))
+            : null;
 
             $name = isset($post['txtName'])
                 ? strtoupper(trim(strClean($post['txtName'])))

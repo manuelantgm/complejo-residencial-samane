@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function(){
                 {
                     "data": null,
                     "render": function(data, type, row){
-                        let btnView   = row.canView   ? `<button class="btn" onClick="fntViewFamily(${row.id_visit})"><i class="far fa-eye"></i> Mas detalles</button>` : "";
                         let btnEdit   = row.canEdit   ? `<button class="btn" onClick="fntEditInfo(this,${row.id_visit})"><i class="fa-solid fa-pen-to-square"></i> Editar</button>` : "";
                         let btnDelete = row.canDelete ? `<button class="btn" onClick="fntDelInfo(${row.id_visit})"><i class="far fa-trash-alt"></i> Eliminar</button>` : "";
 
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function(){
                                     <i class="fa-solid fa-gear"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li>${btnView}</li>
                                     <li>${btnEdit}</li>
                                     <li>${btnDelete}</li>
                                 </ul>
@@ -39,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 },
                 {"data":"names"},
                 {"data":"last_names"},
+                {"data":"identification"},
                 {
                     "data":"status",
                     "render": function(data){
@@ -147,39 +146,6 @@ document.addEventListener('DOMContentLoaded', function(){
 window.addEventListener('load', function() {
     
 }, false);
-
-function fntViewInfo(idpersona){
-    let request = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-    let ajaxUrl = base_url+'/Families/getPropietario/'+idpersona;
-    request.open("GET",ajaxUrl,true);
-    request.send();
-    request.onreadystatechange = function(){
-        if(request.readyState == 4 && request.status == 200){
-            let objData = JSON.parse(request.responseText);
-            if(objData.status)
-            {
-                document.querySelector("#celIdentificacion").innerHTML = objData.data.identificacion;
-                document.querySelector("#celNombre").innerHTML = objData.data.nombres;
-                document.querySelector("#celApellido").innerHTML = objData.data.apellidos;
-                document.querySelector("#celTelefono").innerHTML = objData.data.telefono;
-                document.querySelector("#celEmail").innerHTML = objData.data.email_user;
-                document.querySelector("#celIde").innerHTML = objData.data.nit;
-                document.querySelector("#celNomFiscal").innerHTML = objData.data.nombrefiscal;
-                document.querySelector("#celDirFiscal").innerHTML = objData.data.direccionfiscal;
-                document.querySelector("#celFechaRegistro").innerHTML = objData.data.fechaRegistro; 
-                $('#modalViewCliente').modal('show');
-            }else{
-                Swal.fire({
-                  title: "ERROR",
-                  text: objData.msg,
-                  icon: "error"
-                });
-            }
-        }
-    }
-}
-
-
 
 function fntEditInfo(element, idVisit){
     rowTable = element.closest("tr");

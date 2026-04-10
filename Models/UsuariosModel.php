@@ -157,7 +157,18 @@
 		}
 		public function selectUsuario(int $idusuario){
 			$this->intIdUsuario = $idusuario;
-			$sql = "SELECT u.idusuario,u.identificacion,u.nombres,u.apellidos,u.telefono,u.email_user,u.direccion,r.idrol,r.nombrerol,u.status, DATE_FORMAT(u.datecreated, '%d-%m-%Y') as fechaRegistro 
+			$sql = "SELECT u.idusuario,
+			               u.identificacion,
+			               u.nombres,
+			               u.apellidos,
+			               u.telefono,
+						   u.celular,
+						   u.email_user,
+						   u.direccion,
+						   r.idrol,
+						   r.nombrerol,
+						   u.status,
+						   DATE_FORMAT(u.datecreated, '%d-%m-%Y') as fechaRegistro 
 					FROM usuarios u
 					INNER JOIN rol r
 					ON u.rolid = r.idrol
@@ -233,7 +244,7 @@
 			return $request;
 		}
 
-		public function updatePerfil(int $idUsuario, string $nombre,string $lastname, string $telefono, string $email, string $password){
+		/*public function updatePerfil(int $idUsuario, string $nombre,string $lastname, string $telefono, string $email, string $password){
 			$this->intIdUsuario = $idUsuario;
 			$this->strNombre = $nombre;
 			$this->strLastname = $lastname;
@@ -241,9 +252,25 @@
 			$this->strEmail = $email;
 			$this->strPassword = $password;
 
+			// Validar email duplicado
+			if (!empty($this->strEmail)) {
+				$sql = "SELECT idusuario
+						FROM usuarios
+						WHERE (email_user = ? AND idusuario != ?)
+						AND idusuario != ?
+						AND status != 0
+						LIMIT 1";
+
+				$exists = $this->select($sql, [$this->strEmail, $this->intIdUsuario, $this->intIdUsuario]);
+
+				if (!empty($exists)) {
+					return "emailExist";
+				}
+			}
+
 			if($this->strPassword != "")
 			{
-				$sql = "UPDATE usuarios SET nombres=?, apellidos = ?, telefono=?, email_user=?, password=?, direccionfiscal=?
+				$sql = "UPDATE usuarios SET nombres=?, apellidos = ?, telefono=?, email_user=?, password=?
 						WHERE idusuario = ? ";
 				$arrData = array($this->strNombre,
 								$this->strLastname,
@@ -262,6 +289,77 @@
 			}
 			$request = $this->update($sql,$arrData);
 		    return $request;
+		}*/
+		public function updatePerfil(
+			int $idUsuario,
+			string $nombre,
+			string $lastname,
+			string $telefono,
+			string $email,
+			string $password
+		){
+			$this->intIdUsuario = $idUsuario;
+			$this->strNombre = $nombre;
+			$this->strLastname = $lastname;
+			$this->intTelefono = $telefono;
+			$this->strEmail = $email;
+			$this->strPassword = $password;
+
+			// Validar email duplicado
+			if (!empty($this->strEmail)) {
+				$sql = "SELECT idusuario
+						FROM usuarios
+						WHERE email_user = ?
+						AND idusuario != ?
+						AND status != 0
+						LIMIT 1";
+
+				$exists = $this->select($sql, [
+					$this->strEmail,
+					$this->intIdUsuario
+				]);
+
+				if (!empty($exists)) {
+					return "emailExist";
+				}
+			}
+
+			if ($this->strPassword != "") {
+				$sql = "UPDATE usuarios 
+						SET nombres = ?, 
+							apellidos = ?, 
+							telefono = ?, 
+							email_user = ?, 
+							password = ?
+						WHERE idusuario = ?";
+
+				$arrData = array(
+					$this->strNombre,
+					$this->strLastname,
+					$this->intTelefono,
+					$this->strEmail,
+					$this->strPassword,
+					$this->intIdUsuario
+				);
+			} else {
+				$sql = "UPDATE usuarios 
+						SET nombres = ?, 
+							apellidos = ?, 
+							telefono = ?, 
+							email_user = ?
+						WHERE idusuario = ?";
+
+				$arrData = array(
+					$this->strNombre,
+					$this->strLastname,
+					$this->intTelefono,
+					$this->strEmail,
+					$this->intIdUsuario
+				);
+			}
+
+			$request = $this->update($sql, $arrData);
+			return $request;
 		}
 
 		public function updateImage(int $idUsuario,string $image){

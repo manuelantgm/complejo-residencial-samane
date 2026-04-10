@@ -51,7 +51,11 @@
 					{
 						$option = 1;
 						$strPassword =  empty($_POST['txtPassword']) ? hash("SHA256",passGenerator()) : hash("SHA256",$_POST['txtPassword']);
+						$strPassword = empty($_POST['txtPassword']) 
+						? passGenerator() 
+						: $_POST['txtPassword'];
 
+					$passwordHash = password_hash($strPassword, PASSWORD_DEFAULT);
 						if($_SESSION['permisosMod']['w']){
 							$request_user = $this->model->insertUsuario($strIdentification,
 																		$strPassport,
@@ -60,7 +64,7 @@
 																		$intTel, 
 																		$intCell,
 																		$strEmail,
-																		$strPassword,
+																		$passwordHash,
 																		$intLocationId,
 																		$intStreetId,
 																		$intHomeNumber,
@@ -69,7 +73,7 @@
 						}
 					}else{
 						$option = 2;
-						$strPassword =  empty($_POST['txtPassword']) ? "" : hash("SHA256",$_POST['txtPassword']);
+						$passwordHash = empty($_POST['txtPassword']) ? "" : password_hash($_POST['txtPassword'], PASSWORD_DEFAULT);
 						if($_SESSION['permisosMod']['u']){
 							$request_user = $this->model->updateUsuario($idUsuario, 
 																		$strIdentification,
@@ -79,7 +83,7 @@
 																		$intTel, 
 																		$intCell,
 																		$strEmail,
-																		$strPassword,
+																		$passwordHash,
 																		$intLocationId,
 																		$intStreetId,
 																		$intHomeNumber,
@@ -321,6 +325,14 @@
 					$strEmail,
 					$passwordHash
 				);
+
+				if ($request_user === "emailExist") {
+					echo json_encode([
+						'status' => false,
+						'msg' => 'El correo electrónico ya está registrado por otro usuario.'
+					], JSON_UNESCAPED_UNICODE);
+					die();
+				}
 
 				if (!$request_user) {
 					echo json_encode([

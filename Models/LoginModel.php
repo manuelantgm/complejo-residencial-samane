@@ -12,15 +12,16 @@
 			parent::__construct();
 		}	
 
-		public function loginUser(string $usuario, string $password)
+		public function loginUser(string $usuario)
 		{
 			$this->strUsuario = $usuario;
-			$this->strPassword = $password;
-			$sql = "SELECT idusuario,status FROM usuarios WHERE 
-					email_user = '$this->strUsuario' and 
-					password = '$this->strPassword' and 
-					status != 0 ";
-			$request = $this->select($sql);
+
+			$sql = "SELECT idusuario, password, status
+					FROM usuarios
+					WHERE email_user = ?
+					LIMIT 1";
+
+			$request = $this->select($sql, array($this->strUsuario));
 			return $request;
 		}
 
@@ -31,6 +32,7 @@
 						   u.nombres,
 						   u.apellidos,
 						   u.telefono,
+						   u.celular,
 						   u.email_user,
 						   r.idrol,
 						   r.nombrerol,

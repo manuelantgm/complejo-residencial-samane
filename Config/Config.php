@@ -4,12 +4,23 @@
 	//Zona horaria
 	date_default_timezone_set('America/Santo_Domingo');
 
-	//Datos de conexión a Base de Datos
-	const DB_HOST = "localhost";
-	const DB_NAME = "db_crs";
-	const DB_USER = "root";
-	const DB_PASSWORD = "";
-	const DB_CHARSET = "charset=utf8";
+	// Configuración de bases de datos
+	const DB_CONFIG = [
+		'crs' => [
+			'host'     => 'localhost',
+			'dbname'   => 'db_crs',
+			'user'     => 'root',
+			'password' => '',
+			'charset'  => 'utf8mb4'
+		],
+		'awm' => [
+			'host'     => 'localhost',
+			'dbname'   => 'db_awm',
+			'user'     => 'root',
+			'password' => '',
+			'charset'  => 'utf8mb4'
+		]
+	];
 
 	//Para envío de correo
 	const ENVIRONMENT = 0; // Local: 0, Produccón: 1;

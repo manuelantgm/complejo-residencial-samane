@@ -1,22 +1,24 @@
 <?php 
 	require 'Libraries/html2pdf/vendor/autoload.php';
 	use Spipu\Html2Pdf\Html2Pdf;
+
 	require 'Libraries/NumbreToLetter/numberToLetter.php';
-	class Families extends Controllers{
-		private $db;
+
+	class Families extends Controllers
+	{
 		public function __construct()
 		{
 			parent::__construct();
 			session_start();
-			//session_regenerate_id(true);
-			if(empty($_SESSION['login']))
-			{
-				header('Location: '.base_url().'/login');
+
+			// session_regenerate_id(true);
+
+			if (empty($_SESSION['login'])) {
+				header('Location: ' . base_url() . '/login');
 				die();
 			}
+
 			getPermisos(MFAMILIES);
-			// Instancia de conexión
-			$this->db = new Conexion();
 		}
 
 		public function familias()
@@ -51,8 +53,6 @@
                 if (!$isNew && empty($_SESSION['permisosMod']['u'])) {
                     throw new Exception('No tiene permisos para actualizar familias.');
                 }
-
-                $this->db->begin();
 
                 if ($isNew) {
                     $familyId = $this->model->insertFamily(
@@ -114,8 +114,6 @@
                     }
                 }
 
-                $this->db->commit();
-
                 $arrResponse = [
                     'status' => true,
                     'msg' => $isNew
@@ -124,10 +122,6 @@
                 ];
 
             } catch (Exception $e) {
-                if ($this->db->inTransaction()) {
-                    $this->db->rollback();
-                }
-
                 $arrResponse = [
                     'status' => false,
                     'msg' => $e->getMessage()

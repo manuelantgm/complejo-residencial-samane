@@ -9,14 +9,12 @@
           <div class="container">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1><i class="fa-solid fa-people-group"></i> <strong><?= strtoupper($data['page_title']); ?></strong></h1>
+                <h1><i class="fa-regular fa-handshake"></i> <strong><?= strtoupper($data['page_title']); ?></strong></h1>
               </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                   <li class="breadcrumb-item">
-                    <?php if($_SESSION['permisosMod']['w']){ ?>
-                    <button type="button" onclick="openModal();" class="btn btn-block btn-success btn-sm"><i class='ion ion-person-add'></i> <strong>Nueva visita</strong></button>
-                    <?php } ?>
+                    
                   </li>
                 </ol>
               </div>
@@ -32,10 +30,12 @@
                 <!-- Default box -->
                 <div class="card card-info card-outline">
                   <div class="card-header">
-                    <h3 class="card-title"><i class="fa-solid fa-people-group"></i> Listando Visitas</h3>
+                    <h3 class="card-title"><i class="fa-regular fa-handshake"></i> Listando Visitas</h3>
 
                     <div class="card-tools">
-                      
+                      <?php if($_SESSION['permisosMod']['w']){ ?>
+                        <button type="button" onclick="openModal();" class="btn btn-block btn-success btn-sm"><i class='fa-regular fa-handshake'></i> <strong>Agregar visita</strong></button>
+                      <?php } ?>
                     </div>
                   </div>
                   <div class="card-body table-responsive">
@@ -45,6 +45,7 @@
                           <th>Acciones</th>
                           <th>Nombres</th>
                           <th>Apellidos</th>
+                          <th>Identificación</th>
                           <th>Status</th>
                         </tr>
                       </thead>

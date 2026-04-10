@@ -238,15 +238,16 @@ function fntEditInfo(element, idperson){
                 document.querySelector("#idFamily").value = objData.data.id_family;
                 document.querySelector("#listAge").value =objData.data.legal_age;
                 $('#listAge').selectpicker('render');
-                document.querySelector("#txtIdentification").value = objData.data.identification;
+                document.querySelector("#txtIdentification").value = objData.data.identification ?? '';
+                document.querySelector("#txtPassport").value = objData.data.passport ?? '';
                 document.querySelector("#txtName").value = objData.data.names;
                 document.querySelector("#txtLastName").value = objData.data.last_names;
                 document.querySelector("#txtRelationship").value = objData.data.relationship;
-                document.querySelector("#intPhone").value =objData.data.phone;
-                document.querySelector("#listStreetId").value =objData.data.street_id;
+                document.querySelector("#intPhone").value =objData.data.phone ?? '';
+                document.querySelector("#listStreetId").value =objData.data.street_id ?? 0;
                 $('#listStreetId').selectpicker('render');
                 document.querySelector("#intNumber").value =objData.data.home_number;
-                document.querySelector("#txtEmail").value =objData.data.email;
+                document.querySelector("#txtEmail").value =objData.data.email ?? '';
             }
         }
         $('#modalFormFamily').modal('show');

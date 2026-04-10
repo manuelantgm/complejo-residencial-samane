@@ -33,7 +33,7 @@
               <span class="info-box-icon bg-info"><i class="fa-solid fa-people-group"></i></span>
               <div class="info-box-content">
                 <span class="info-box-text">(<?= $data['persons'] ?>) Personas</span>
-                <span class="info-box-number"><?= $data['persons'] ?> <i class="pl-2 fa fa-question-circle tip text-right" data-toggle="tooltip" data-placement="top" title="Total de personas asociadas directamente."></i> </span>
+                <span class="info-box-number"><?= $data['persons'] ?> <i class="pl-2 fa fa-question-circle tip text-right" data-toggle="tooltip" data-placement="top" title="Total de personas asociadas."></i> </span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -58,7 +58,7 @@
           <div class="col-md-3 col-sm-6 col-12">
             <a href="<?= base_url(); ?>/crs/empleados" style="color:inherit;">
               <div class="info-box">
-                <span class="info-box-icon bg-info"><i class="fa-solid fa-list-check"></i></span>
+                <span class="info-box-icon bg-info"><i class="fa-solid fa-people-carry-box"></i></span>
                 <div class="info-box-content">
                   <span class="info-box-text">(<?= $data['employees'] ?>) Empleados</span>
                   <span class="info-box-number"><?= $data['employees'] ?> <i class="pl-2 fa fa-question-circle tip text-right" data-toggle="tooltip" data-placement="top" title="Empleados asociados al usuario principal o a la familia."></i></span>

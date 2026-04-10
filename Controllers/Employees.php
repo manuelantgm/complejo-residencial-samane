@@ -1,24 +1,26 @@
 <?php 
-	require 'Libraries/html2pdf/vendor/autoload.php';
-	use Spipu\Html2Pdf\Html2Pdf;
-	require 'Libraries/NumbreToLetter/numberToLetter.php';
-	class Employees extends Controllers{
-		private $db;
-		public function __construct()
-		{
-			parent::__construct();
-			session_start();
-			//session_regenerate_id(true);
-			if(empty($_SESSION['login']))
-			{
-				header('Location: '.base_url().'/login');
-				die();
-			}
-			getPermisos(MEMPLOYEES);
-			// Instancia de conexión
-			$this->db = new Conexion();
-		}
+    require 'Libraries/html2pdf/vendor/autoload.php';
+    use Spipu\Html2Pdf\Html2Pdf;
 
+    require 'Libraries/NumbreToLetter/numberToLetter.php';
+
+    class Employees extends Controllers
+    {
+        public function __construct()
+        {
+            parent::__construct();
+            session_start();
+
+            // session_regenerate_id(true);
+
+            if (empty($_SESSION['login'])) {
+                header('Location: ' . base_url() . '/login');
+                die();
+            }
+
+            getPermisos(MEMPLOYEES);
+        }
+    
 		public function view()
 		{
 			if(empty($_SESSION['permisosMod']['r'])){
@@ -126,13 +128,13 @@
             $idEmployee = isset($post['idEmployee']) ? intval($post['idEmployee']) : 0;
             $idUser = isset($_SESSION['idUser']) ? intval($_SESSION['idUser']) : 0;
 
-            $identification = isset($post['txtIdentification'])
-                ? preg_replace('/[^0-9]/', '', strClean($post['txtIdentification']))
-                : '';
+            $identification = (!empty($post['txtIdentification']) && trim($post['txtIdentification']) !== '')
+            ? preg_replace('/[^0-9]/', '', strClean($post['txtIdentification']))
+            : null;
 
-            $passport = isset($post['txtPassport'])
-                ? strtoupper(trim(strClean($post['txtPassport'])))
-                : '';
+            $passport = isset($post['txtPassport']) && trim($post['txtPassport']) !== ''
+            ? strtoupper(trim(strClean($post['txtPassport'])))
+            : null;
 
             $name = isset($post['txtName'])
                 ? strtoupper(trim(strClean($post['txtName'])))

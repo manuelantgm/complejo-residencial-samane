@@ -422,3 +422,31 @@
 .toast-icon{
   font-size: 2rem;
 }
+
+.content-wrapper {
+    background: 
+        linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
+        url('../../img/crsLogo.png');
+    background-size: contain;     /* importante aquí */
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+.info-box {
+    background: rgba(255,255,255,0.3);
+}
+
+/* CARD COMPLETA */
+.card {
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 12px;
+    
+}
+
+/* BODY */
+.card-body {
+    background: transparent !important;
+}

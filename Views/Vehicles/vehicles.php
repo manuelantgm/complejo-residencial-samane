@@ -14,9 +14,7 @@
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                   <li class="breadcrumb-item">
-                    <?php if($_SESSION['permisosMod']['w']){ ?>
-                    <button type="button" onclick="openModal();" class="btn btn-block btn-success btn-sm"><i class="fa-solid fa-circle-plus"></i> <strong>Agregar vehiculo</strong></button>
-                    <?php } ?>
+                    
                   </li>
                 </ol>
               </div>
@@ -35,7 +33,9 @@
                     <h3 class="card-title"><i class="fa-solid fa-car"></i> Listando vehiculos</h3>
 
                     <div class="card-tools">
-                      
+                      <?php if($_SESSION['permisosMod']['w']){ ?>
+                      <button type="button" onclick="openModal();" class="btn btn-block btn-success btn-sm"><i class="fa-solid fa-car"></i> <strong>Agregar vehiculo</strong></button>
+                      <?php } ?>
                     </div>
                   </div>
                   <div class="card-body table-responsive">

@@ -4,7 +4,7 @@ class EmployeesModel extends Mysql
 	private $intIdUser;
 	private $strName;
 	private $strLastName;
-	private $intIdentification;
+	private $strIdentification;
     private $strPassport;
 	private $intTypeEmp;
 	private $intOcupation;
@@ -20,8 +20,8 @@ class EmployeesModel extends Mysql
 	public function insertEmployee(int $userId,
                                    string $name,
                                    string $lastName,
-                                   string $identification,
-                                   string $passport,
+                                   ?string $identification,
+                                   ?string $passport,
                                    int $empType,
                                    int $ocupationId
                                 ) {

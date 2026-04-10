@@ -14,14 +14,14 @@
 
 		public function login()
 		{
-			$data['page_tag'] = SIGLAS." - IBP";
+			$data['page_tag'] = SIGLAS." - LOGIN";
 			$data['page_title'] = "GomezSys";
 			$data['page_name'] = "login";
 			$data['page_functions_js'] = "functions_login.js";
 			$this->views->getView($this,"login",$data);
 		}
 
-		public function loginUser(){
+		/*public function loginUser(){
 			//dep($_POST);
 			if($_POST){
 				if(empty($_POST['txtEmail']) || empty($_POST['txtPassword'])){
@@ -47,6 +47,68 @@
 					}
 				}
 				echo json_encode($arrResponse,JSON_UNESCAPED_UNICODE);
+			}
+			die();
+		}*/
+		public function loginUser()
+		{
+			if ($_POST) {
+
+				if (empty($_POST['txtEmail']) || empty($_POST['txtPassword'])) {
+					$arrResponse = array(
+						'status' => false,
+						'msg' => 'Error de datos'
+					);
+				} else {
+
+					$strUsuario  = strtolower(strClean($_POST['txtEmail']));
+					$strPassword = $_POST['txtPassword'];
+
+					$requestUser = $this->model->loginUser($strUsuario);
+
+					if (empty($requestUser)) {
+
+						$arrResponse = array(
+							'status' => false,
+							'msg' => 'El usuario o la contraseña es incorrecto.'
+						);
+
+					} else {
+
+						if ((int)$requestUser['status'] !== 1) {
+
+							$arrResponse = array(
+								'status' => false,
+								'msg' => 'Usuario inactivo.'
+							);
+
+						} else {
+
+							if (password_verify($strPassword, $requestUser['password'])) {
+
+								$_SESSION['idUser'] = $requestUser['idusuario'];
+								$_SESSION['login'] = true;
+
+								$arrData = $this->model->sessionLogin($_SESSION['idUser']);
+								sessionUser($_SESSION['idUser']);
+
+								$arrResponse = array(
+									'status' => true,
+									'msg' => 'ok'
+								);
+
+							} else {
+
+								$arrResponse = array(
+									'status' => false,
+									'msg' => 'El usuario o la contraseña es incorrecto.'
+								);
+							}
+						}
+					}
+				}
+
+				echo json_encode($arrResponse, JSON_UNESCAPED_UNICODE);
 			}
 			die();
 		}
